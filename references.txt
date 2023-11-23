@@ -1,1 +1,4 @@
-< aici vom adauga orice resursa/cod/etc. pe care o folosim dar nu este creatia noastra >
+Python libs:
+    scipy
+    pandas
+    numpy
