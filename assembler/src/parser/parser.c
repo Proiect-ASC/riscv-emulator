@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#define ID_KW_LB_STARTCHARS "_0123456789qwertyuiopasdfghjklzxcvbnm"
-#define ID_KW_LB_VLDCHARS "_0123456789qwertyuiopasdfghjklzxcvbnm.- \n:"
+#define LETTERS  "qwertyuiopasdfghjklzxcvbnm"
+#define NUMBERS "0123456789"
+#define LETANDNUM "qwertyuiopasdfghjklzxcvbnm0123456789"
+#define KWIDLB "qwertyuiopasdfghjklzxcvbnm0123456789._-"
+#define SEPARATORS " \n,()[]-"
 
 typedef struct dfa_edge
 {
@@ -48,13 +51,13 @@ dfa_node* init_dfa()
 	add_edge(&dfa[COMMENT], new_dfa_edge(START, "\n", 0));
 	// LABEL
 	add_edge(&dfa[START], new_dfa_edge(LABELERR, ".", 0));
-	add_edge(&dfa[LABELERR], new_dfa_edge(ERROR, ID_KW_LB_VLDCHARS, 1));
-	add_edge(&dfa[LABELERR], new_dfa_edge(LABEL, " \n", 0));
-	add_edge(&dfa[ID_KW_LBERR], new_dfa_edge(LABEL, ":", 0));
-	// ID_KW
-	add_edge(&dfa[START], new_dfa_edge(ID_KW_LBERR, ID_KW_LB_STARTCHARS, 0));
-	add_edge(&dfa[ID_KW_LBERR], new_dfa_edge(ERROR, ID_KW_LB_VLDCHARS, 0));
-	add_edge(&dfa[ID_KW_LBERR], new_dfa_edge(ID_KW, " ,\n", 0));
+	add_edge(&dfa[LABELERR], new_dfa_edge(LABEL, SEPARATORS, 0));
+	// IM_LB
+	add_edge(&dfa[START], new_dfa_edge(IM_LBERR, NUMBERS, 0));
+	add_edge(&dfa[IM_LBERR], new_dfa_edge(IM_LB, SEPARATORS, 0));
+	// ID_KW_LB
+	add_edge(&dfa[START], new_dfa_edge(ID_KW_LBERR, KWIDLB, 0));
+	add_edge(&dfa[ID_KW_LBERR], new_dfa_edge(ID_KW_LB, SEPARATORS, 0));
 	// COMA
 	add_edge(&dfa[START], new_dfa_edge(COMA, ",", 0));
 	// LPAREN
@@ -76,7 +79,9 @@ token_type transition(token_type current, const char ch, dfa_node *dfa)
 	for(int i = 0; i < dfa[current].edge_count; i++)
 	{
 		dfa_edge edge = dfa[current].edges[i];
-		if(strchr(edge.transition_chars, (int) ch) != NULL)
+		if(strchr(edge.transition_chars, (int) ch) != NULL && edge.all_but == 0)
+			return edge.next;
+		else if(strchr(edge.transition_chars, (int) ch) == NULL && edge.all_but == 1)
 			return edge.next;
 	}
 	if(current == START)
@@ -88,63 +93,180 @@ token new_token(token_type type, const char* text)
 {
 	token t;
 	t.type = type;
-	strcpy(t.text, text);
+	t.text = (const char *) malloc(strlen(text) + 1);
+	strcpy((char *) t.text, text);
 	return t;
 }
 
-int is_terminal(token_type state)
+token_type get_kw_or_id(const char* text)
 {
-	return state == LABEL || state == COMA || state == MINUS ||
-		   state == LPAREN || state == RPAREN || state == LSQBR ||
-		   state == RSQBR || state == ID_KW || state == STRINGLIT;
+	if(strcmp(text, "add") == 0)
+		return ADD;
+	else if(strcmp(text, "lb") == 0)
+		return LB;
+	else if(strcmp(text, "beqz") == 0)
+		return BEQZ;
+	else if(strcmp(text, "addi") == 0)
+		return ADDI;
+	else if(strcmp(text, "j") == 0)
+		return J;
+	else if(strcmp(text, "mv") == 0)
+		return MV;
+	else if(strcmp(text, "ret") == 0)
+		return RET;
+	else if(strcmp(text, "sb") == 0)
+		return SB;
+	else if(strcmp(text, "bge") == 0)
+		return BGE;
+	else if(strcmp(text, "sd") == 0)
+		return SD;
+	else if(strcmp(text, "mv") == 0)
+		return MV;
+	else if(strcmp(text, "call") == 0)
+		return CALL;
+	else if(strcmp(text, "srai") == 0)
+		return SRAI;
+	else if(strcmp(text, "sub") == 0)
+		return SUB;
+	else if(strcmp(text, "ld") == 0)
+		return LD;
+	else if(strcmp(text, "slli") == 0)
+		return SLLI;
+	else if(strcmp(text, "lw") == 0)
+		return LW;
+	else if(strcmp(text, "ble") == 0)
+		return BLE;
+	else if(strcmp(text, "bnez") == 0)
+		return BNEZ;
+	else if(strcmp(text, "fld") == 0)
+		return FLD;
+	else if(strcmp(text, "fsw") == 0)
+		return FSW;
+	else if(strcmp(text, "la") == 0)
+		return LA;
+	else if(strcmp(text, "bgt") == 0)
+		return BGT;
+	else if(strcmp(text, "flw") == 0)
+		return FLW;
+	else if(strcmp(text, "fadd.s") == 0)
+		return FADDS;
+	else if(strcmp(text, "fmul.s") == 0)
+		return FMULS;
+	else if(strcmp(text, "fmul.s.x") == 0)
+		return FMULSX;
+	else if(strcmp(text, "fmv.s") == 0)
+		return FMVS;
+	else if(strcmp(text, "flt.s") == 0)
+		return FLTS;
+	else if(strcmp(text, "fgt.s") == 0)
+		return FGTS;
+	else if(strcmp(text, "fsqrt.d") == 0)
+		return FSQRTD;
+	else if(strcmp(text, "fadd.d") == 0)
+		return FADDD;
+	else if(strcmp(text, "fmul.d") == 0)
+		return FMULD;
+	else if(strcmp(text, "fsub.d") == 0)
+		return FSUBD;
+	else if(strcmp(text, "li") == 0)
+		return LI;
+	return IDENTIFIER;
+}
+
+token_type get_token_type(token_type state, const char* text)
+{
+	token_type type;
+	switch(state)
+	{
+		case ID_KW_LB:
+			if(text[strlen(text) - 1] == ':')
+				type = LABEL;
+			else
+				type = get_kw_or_id(text);
+			break;
+		case IM_LB:
+			if(text[strlen(text) - 1] == ':')
+				type = LABEL;
+			else
+				type = IMMEDIATE;
+			break;
+		default:
+			type = state;
+			break;
+	}
+	return type;
 }
 
 token_array lex_file(const char* file_name)
 {
 	FILE* f = fopen(file_name, "r");
-	char curr_char = "\0";
+	char curr_char = '\0';
 	token_type curr_state = START;
-	const char word[64];
+	int word_buffer_len = 256;
+	char word[word_buffer_len];
 	int word_len = 0;
+	dfa_node *dfa = init_dfa();
 	token_array tarr;
 	tarr.array = NULL;
 	tarr.size = 0;
 	
 	while(1)
 	{
-		fscanf(f, "%c", &curr_char);
-		if(curr_char == EOF)
+		int input = fgetc(f);
+		if(input == EOF)
 		{
 			tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token));	
 			tarr.array[tarr.size - 1] = new_token(END, "EOF"); 
 			break;
 		}
-		if(is_terminal(curr_state))
+		curr_char = (int) input;
+		curr_state = transition(curr_state, curr_char, dfa);
+		switch(curr_state)
 		{
-			tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token));
-			word[word_len] = '\0';
-			tarr.array[tarr.size - 1] = new_token(next_state, word);
-			word_len = 0;
-			curr_state = transition(START, curr_char);
-		}
-		else
-		{
-			word[word_len++] = curr_char;	
-			if(word_len > 63)
-			{
-				perror("[ERROR] word buffer overflow");
+			case LPAREN:
+			case RPAREN:
+			case LSQBR:
+			case RSQBR:
+			case MINUS:
+			case COMA:
+			case ID_KW_LB:
+			case LABEL:
+			case STRINGLIT:
+			case IM_LB:
+				tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token));
+				word[word_len] = '\0';
+				tarr.array[tarr.size - 1] = new_token(get_token_type(curr_state, (const char *) word), word);
+				curr_state = transition(START, curr_char, dfa);
+				word_len = 0;
+				if(curr_char != ' ' && curr_char != '\n')
+				{
+					word_len = 1;
+					word[0] = curr_char;
+				}
+				break;
+			case START:
+			case COMMENT:
+				word_len = 0;
+				word[0] = curr_char;
+				break;
+			case STRINGLITERR:
+			case ID_KW_LBERR:
+			case LABELERR:
+			case IM_LBERR:
+				word[word_len++] = curr_char;	
+				if(word_len == word_buffer_len)
+				{
+					perror("[ERROR] word buffer overflow\n");
+					exit(1);
+				}		
+				break;
+			default:
+				fprintf(stderr, "[ERROR] undefined behavior: encountered %d\n", curr_state);
 				exit(1);
-			}		
+				break;
+				
 		}
-		curr_state = transition(curr_state, ch);
 	}
 	return tarr;
 }
-
-
-
-
-
-
-
 
