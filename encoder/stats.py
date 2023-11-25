@@ -1,5 +1,4 @@
 import re
-import pandas as pd
 import scipy
 import numpy as np
 
@@ -17,8 +16,8 @@ def count_tokens(file, tokens):
 
 
 def compute_appearence_probabilities(tokens_counts):
-    token_counts = pd.DataFrame(tokens_counts, index=[0])
-    return np.asarray(token_counts.values).reshape(len(tokens_counts)) / np.asarray(token_counts.values).sum()
+    appearences = list(tokens_counts.values())
+    return np.asarray(appearences).reshape(len(tokens_counts)) / np.asarray(appearences).sum()
 
 
 def compute_appearence_entropy(probs):

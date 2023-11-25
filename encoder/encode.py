@@ -1,14 +1,23 @@
-import pandas as pd
-from queue import PriorityQueue
+from data_structs.priorityqueue import PriorityQueue
+from data_structs.btree import Node
 from stats import read_tokens, count_tokens, compute_appearence_entropy, compute_appearence_probabilities
+from huffman import build_huffman_tree
+
+
+def encoding_efficiency_test(code_table, tokens_counts, entropy):
+    tokens_probs = {k: (lambda x: x / sum(list(tokens_counts.values())))(v) for k, v in tokens_counts.items()}
+    average_encoding_lenght = 0
+    for item, code in code_table.items():
+        average_encoding_lenght += len(code) * tokens_probs[item]
+    return entropy / average_encoding_lenght * 100, average_encoding_lenght
+
 
 tokens = read_tokens("instructions.txt")
 tokens_counts = count_tokens("raw_data.txt", tokens)
 tokens_probs = compute_appearence_probabilities(tokens_counts)
 entropy = compute_appearence_entropy(tokens_probs)
 
-tokens_counts = [(v, k) for k, v in tokens_counts.items()]
-tokens_counts_pq = PriorityQueue()
+tokens_counts_nodes_pq = PriorityQueue([Node(value=[v, k]) for k, v in tokens_counts.items()])
 
-for item in tokens_counts:
-    tokens_counts_pq.put(item)
+huffman_tree, code_table = build_huffman_tree(tokens_counts_nodes_pq)
+print(f"encoding eff. is {encoding_efficiency_test(code_table, tokens_counts, entropy)}, code table is:\n{code_table}")
