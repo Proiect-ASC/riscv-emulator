@@ -52,6 +52,7 @@ dfa_node* init_dfa()
 	// LABEL
 	add_edge(&dfa[START], new_dfa_edge(LABELERR, ".", 0));
 	add_edge(&dfa[LABELERR], new_dfa_edge(LABEL, SEPARATORS, 0));
+	add_edge(&dfa[ID_KW_LBERR], new_dfa_edge(LABEL, ":", 0));
 	// IM_LB
 	add_edge(&dfa[START], new_dfa_edge(IM_LBERR, NUMBERS, 0));
 	add_edge(&dfa[IM_LBERR], new_dfa_edge(IM_LB, SEPARATORS, 0));
@@ -221,7 +222,6 @@ token_array lex_file(const char* file_name)
 		}
 		curr_char = (char) input;
 		curr_state = transition(curr_state, curr_char, dfa);
-		printf("state: %d\nchar: %c\nword_len: %d\n\n", curr_state, curr_char, word_len);
 		switch(curr_state)
 		{
 			case LPAREN:
@@ -231,7 +231,6 @@ token_array lex_file(const char* file_name)
 			case MINUS:
 			case COMA:
 			case ID_KW_LB:
-			case LABEL:
 			case IM_LB:
 				tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token));
 				word[word_len] = '\0';
@@ -245,11 +244,14 @@ token_array lex_file(const char* file_name)
 				}
 				break;
 			case STRINGLIT:
+			case LABEL:
 				tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token)); 
-				word[word_len++] = '"';
+				if(curr_char != ' ' && curr_char != '\n')
+					word[word_len++] = curr_char;
 				word[word_len] = '\0';
 				tarr.array[tarr.size - 1] = new_token(get_token_type(curr_state, word), word);
 				curr_state = START;
+				word_len = 0;
 				break;
 			case START:
 			case COMMENT:
