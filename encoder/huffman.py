@@ -1,11 +1,10 @@
-from data_structs.priorityqueue import PriorityQueue
 from data_structs.btree import Node
 
 
 def build_huffman_tree(tokens_counts_nodes_pq):
     while not tokens_counts_nodes_pq.qsize() == 1:
         l, r = tokens_counts_nodes_pq.pop(), tokens_counts_nodes_pq.pop()
-        new_node = Node(l, r, val=list(map(lambda x, y: x + y, l.value, r.value)))
+        new_node = Node(l, r, value=list(map(lambda x, y: x + y, l.value, r.value)))
         tokens_counts_nodes_pq.push(new_node)
 
     current = tokens_counts_nodes_pq.pop()

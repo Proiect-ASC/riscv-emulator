@@ -1,4 +1,5 @@
 Python libs:
     scipy
-    pandas
     numpy
+    bisect
+    functools

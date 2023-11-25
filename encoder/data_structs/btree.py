@@ -4,10 +4,10 @@ import functools
 # very basic binary tree support class
 @functools.total_ordering
 class Node:
-    def __init__(self, left=None, right=None, val=None):
+    def __init__(self, left=None, right=None, value=None):
         self.left = left
         self.right = right
-        self.value = val
+        self.value = value
 
     def __lt__(self, other):
         return self.value < other.value
