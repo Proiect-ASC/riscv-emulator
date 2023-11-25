@@ -23,10 +23,3 @@ def compute_appearence_probabilities(tokens_counts):
 
 def compute_appearence_entropy(probs):
     return scipy.stats.entropy(probs, base=2)
-
-
-tokens = read_tokens("instructions.txt")
-tokens_counts = count_tokens("raw_data.txt", tokens)
-tokens_probs = compute_appearence_probabilities(tokens_counts)
-entropy = compute_appearence_entropy(tokens_probs)
-print(entropy)
