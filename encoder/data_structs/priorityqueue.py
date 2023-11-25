@@ -10,7 +10,7 @@ class PriorityQueue:
         bisect.insort(self.contents,
                       item)  # the items we store supposedly have __lt__ defined in such a way they are compatible with bisect.insort
 
-    def pop(self, item):
+    def pop(self):
         return self.contents.pop(0)
 
     def qsize(self):
