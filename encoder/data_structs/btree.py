@@ -14,3 +14,6 @@ class Node:
 
     def __str__(self):
         return f"{self.value}"
+
+    def isleaf(self):
+        return self.left is None and self.right is None
