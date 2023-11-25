@@ -23,7 +23,7 @@ typedef enum token_type
 	RSQBR,         // 14
 	COMA,          // 15
 	MINUS,         // 16
-	START,         // 17
+	START,         // ;7
 	ERROR,         // 18
 	END,           // 19
 	IM_LB,         // 20
@@ -69,15 +69,20 @@ typedef enum token_type
 
 typedef struct token
 {
-	token_type type;
-	const char* text;
+	token_type type;  // Type of token (ex: CALL)
+	const char* text; // Underlying text of token (ex: "call")
 } token;
+
+//  Holds a token array
 
 typedef struct token_array
 {
-	token* array;
-	uint32_t size;
+	token* array;  // Token array itself
+	uint32_t size; // Size of token array
 } token_array;
+
+// This function takes in a file path, lexes the file and returns a token array
+// Ex: token_array tarr = lex_file("./sample_file.txt");
 
 token_array lex_file(const char* file_name);
 

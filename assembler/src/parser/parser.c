@@ -219,8 +219,9 @@ token_array lex_file(const char* file_name)
 			tarr.array[tarr.size - 1] = new_token(END, "EOF"); 
 			break;
 		}
-		curr_char = (int) input;
+		curr_char = (char) input;
 		curr_state = transition(curr_state, curr_char, dfa);
+		printf("state: %d\nchar: %c\nword_len: %d\n\n", curr_state, curr_char, word_len);
 		switch(curr_state)
 		{
 			case LPAREN:
@@ -231,11 +232,10 @@ token_array lex_file(const char* file_name)
 			case COMA:
 			case ID_KW_LB:
 			case LABEL:
-			case STRINGLIT:
 			case IM_LB:
 				tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token));
 				word[word_len] = '\0';
-				tarr.array[tarr.size - 1] = new_token(get_token_type(curr_state, (const char *) word), word);
+				tarr.array[tarr.size - 1] = new_token(get_token_type(curr_state, word), word);
 				curr_state = transition(START, curr_char, dfa);
 				word_len = 0;
 				if(curr_char != ' ' && curr_char != '\n')
@@ -243,6 +243,13 @@ token_array lex_file(const char* file_name)
 					word_len = 1;
 					word[0] = curr_char;
 				}
+				break;
+			case STRINGLIT:
+				tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token)); 
+				word[word_len++] = '"';
+				word[word_len] = '\0';
+				tarr.array[tarr.size - 1] = new_token(get_token_type(curr_state, word), word);
+				curr_state = START;
 				break;
 			case START:
 			case COMMENT:
@@ -267,6 +274,8 @@ token_array lex_file(const char* file_name)
 				
 		}
 	}
+	free(dfa);
+	fclose(f);
 	return tarr;
 }
 
