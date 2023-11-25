@@ -9,7 +9,6 @@ ret
 sb
 bge
 sd
-mv
 call
 srai
 sub
@@ -25,7 +24,6 @@ bgt
 flw
 fadd.s
 fmul.s
-fmul.s.x
 fmv.s
 flt.s
 fgt.s
