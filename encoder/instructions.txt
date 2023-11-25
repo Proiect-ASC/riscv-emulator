@@ -25,6 +25,7 @@ flw
 fadd.s
 fmul.s
 fmv.s
+fmv.s.x
 flt.s
 fgt.s
 fsqrt.d
