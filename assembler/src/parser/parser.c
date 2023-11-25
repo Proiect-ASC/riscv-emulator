@@ -171,6 +171,8 @@ token_type get_kw_or_id(const char* text)
 		return FSUBD;
 	else if(strcmp(text, "li") == 0)
 		return LI;
+	else if(strcmp(text, "fmv.s.x" == )
+		return FMVSX
 	return IDENTIFIER;
 }
 

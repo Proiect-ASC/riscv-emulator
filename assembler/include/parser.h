@@ -23,7 +23,7 @@ typedef enum token_type
 	RSQBR,         // 14
 	COMA,          // 15
 	MINUS,         // 16
-	START,         // ;7
+	START,         // 17
 	ERROR,         // 18
 	END,           // 19
 	IM_LB,         // 20
@@ -62,6 +62,7 @@ typedef enum token_type
 	FMULD,         // 53
 	FSUBD,         // 54
 	LI,            // 55
+	FMVSX		   // 56
 	COUNT_TOKEN_TYPE
 } token_type;
 
