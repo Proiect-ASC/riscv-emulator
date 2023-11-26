@@ -2,6 +2,7 @@ from data_structs.priorityqueue import PriorityQueue
 from data_structs.btree import Node
 from stats import read_tokens, count_tokens, compute_appearence_entropy, compute_appearence_probabilities
 from huffman import build_huffman_tree
+from huffman_tree_serializer import serialize
 
 
 def encoding_efficiency_test(code_table, tokens_counts, entropy):
@@ -21,3 +22,5 @@ tokens_counts_nodes_pq = PriorityQueue([Node(value=[v, k]) for k, v in tokens_co
 
 huffman_tree, code_table = build_huffman_tree(tokens_counts_nodes_pq)
 print(f"encoding eff. is {encoding_efficiency_test(code_table, tokens_counts, entropy)}, code table is:\n{code_table}")
+
+serialize(huffman_tree, "serialized_huffman_tree.txt")
