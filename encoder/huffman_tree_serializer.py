@@ -9,7 +9,7 @@ def serialize(huffman_tree, output_file, node_count):
                 stack.append(current)
                 current = current.left
                 if current is not None:
-                    output = current.value[0]
+                    output = current.value[0][-1]
                     if current.isleaf():
                         output += ' ' + current.value[1]
                     output_file.write(output + '\n')
@@ -18,7 +18,7 @@ def serialize(huffman_tree, output_file, node_count):
 
             current = current.right
             if current is not None:
-                output = current.value[0]
+                output = current.value[0][-1]
                 if current.isleaf():
                     output += ' ' + current.value[1]
                 output_file.write(output + '\n')
