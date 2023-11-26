@@ -1,5 +1,7 @@
-def serialize(huffman_tree, output_file):
+def serialize(huffman_tree, output_file, node_count):
     with open(output_file, "w") as output_file:
+        output_file.write(str(node_count) + '\n')
+
         current = huffman_tree
         stack = []
         while current is not None or len(stack) > 0:

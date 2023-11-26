@@ -11,12 +11,14 @@ def build_huffman_tree(tokens_counts_nodes_pq):
     root = current
     current.value[0] = ""
     code_table = {}
+    node_count = 0
 
     stack = []
     while current is not None or len(stack) > 0:
         while current is not None:
             prev_code = current.value[0]
             stack.append(current)
+            node_count += 1
             current = current.left
             if current is not None:
                 current.value[0] = prev_code + '0'
@@ -28,4 +30,4 @@ def build_huffman_tree(tokens_counts_nodes_pq):
         if current is not None:
             current.value[0] = prev_code + '1'
 
-    return root, code_table
+    return root, code_table, node_count

@@ -20,7 +20,7 @@ entropy = compute_appearence_entropy(tokens_probs)
 
 tokens_counts_nodes_pq = PriorityQueue([Node(value=[v, k]) for k, v in tokens_counts.items()])
 
-huffman_tree, code_table = build_huffman_tree(tokens_counts_nodes_pq)
+huffman_tree, code_table, node_count = build_huffman_tree(tokens_counts_nodes_pq)
 print(f"encoding eff. is {encoding_efficiency_test(code_table, tokens_counts, entropy)}, code table is:\n{code_table}")
 
-serialize(huffman_tree, "serialized_huffman_tree.txt")
+serialize(huffman_tree, "serialized_huffman_tree.txt", node_count)
