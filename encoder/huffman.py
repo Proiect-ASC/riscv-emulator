@@ -8,6 +8,7 @@ def build_huffman_tree(tokens_counts_nodes_pq):
         tokens_counts_nodes_pq.push(new_node)
 
     current = tokens_counts_nodes_pq.pop()
+    root = current
     current.value[0] = ""
     code_table = {}
 
@@ -27,4 +28,4 @@ def build_huffman_tree(tokens_counts_nodes_pq):
         if current is not None:
             current.value[0] = prev_code + '1'
 
-    return current, code_table
+    return root, code_table
