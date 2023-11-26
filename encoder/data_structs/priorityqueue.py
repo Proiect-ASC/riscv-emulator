@@ -1,7 +1,6 @@
 import bisect
 
 
-# PriorityQueue class that allows for a sort function (key function) to be chosen. Can't guarantee efficiency as it relies on a List, but it does the trick.
 class PriorityQueue:
     def __init__(self, contents: list = []):  # constructor can take a list of items as default contents
         self.contents = contents
