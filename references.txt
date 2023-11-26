@@ -3,3 +3,4 @@ Python libs:
     numpy
     bisect
     functools
+    re
