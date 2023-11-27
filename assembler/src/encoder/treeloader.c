@@ -3,8 +3,6 @@
 #include <string.h>
 #include "treeloader.h"
 
-codes_map codes;
-
 huffman_node new_huffman_node(const char *name, const char *code, int8_t l, int8_t r)
 {
 	huffman_node node;
@@ -46,7 +44,6 @@ uint8_t dfs(FILE *f, huffman_node *root, char* code, int code_length, uint8_t no
 		char *instr_name = line + 2;
 		line[strlen(instr_name) - 1] = '\0';
 		*node = new_huffman_node(instr_name, code, -1, -1);
-		strcpy(codes.map[++codes.size], code);
 		return node_index;
 	}
 

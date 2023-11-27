@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "parser.h"
 #include "treeloader.h"
+#include "encoder.h"
 
 // For debug only
 
@@ -65,19 +66,12 @@ char token_type_map[][20] = {
 	"FMVSX"
 };
 
-void print_token_array(token_array arr)
+void print_token_array(token_array tarr)
 {
-	for(uint32_t i = 0; i < arr.size; i++)
+	printf("[DEBUG] printing token array\n");
+	for(uint32_t i = 0; i < tarr.size; i++)
 	{
-		printf("%s: %s\n", token_type_map[arr.array[i].type], arr.array[i].text);
-	}
-}
-
-void print_codes_map()
-{
-	for(int i = 0; i < codes.size; i++)
-	{
-		printf("index: %d\ncode: %s\n\n", i, codes.map[i]);
+		printf("%s: %s\n", token_type_map[tarr.array[i].type], tarr.array[i].text);
 	}
 }
 
@@ -89,10 +83,8 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 	const char* file_name = argv[1];
-	// token_array tarr = lex_file(file_name);
-	// print_token_array(tarr);
-	load_huffman_tree(file_name);
-	
-	print_codes_map();
+	token_array tarr = lex_file(file_name);
+	print_token_array(tarr);
+	encode(tarr, "output.txt", "code_table.txt");
 }
 
