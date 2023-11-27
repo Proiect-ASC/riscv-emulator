@@ -62,7 +62,7 @@ typedef enum token_type
 	FMULD,         // 53
 	FSUBD,         // 54
 	LI,            // 55
-	FMVSX		   // 56
+	FMVSX,		   // 56
 	COUNT_TOKEN_TYPE
 } token_type;
 
@@ -74,7 +74,7 @@ typedef struct token
 	const char* text; // Underlying text of token (ex: "call")
 } token;
 
-//  Holds a token array
+//  Holds a token array 
 
 typedef struct token_array
 {

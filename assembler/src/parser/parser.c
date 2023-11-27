@@ -99,7 +99,7 @@ token new_token(token_type type, const char* text)
 	return t;
 }
 
-token_type get_kw_or_id(const char* text)
+token_type str_to_token_type(const char *text)
 {
 	if(strcmp(text, "add") == 0)
 		return ADD;
@@ -171,8 +171,16 @@ token_type get_kw_or_id(const char* text)
 		return FSUBD;
 	else if(strcmp(text, "li") == 0)
 		return LI;
-	else if(strcmp(text, "fmv.s.x" == )
-		return FMVSX
+	else if(strcmp(text, "fmv.s.x") == 0)
+		return FMVSX;
+	return ERROR;
+}
+
+token_type get_kw_or_id(const char* text)
+{
+	token_type token = str_to_token_type(text);
+	if(token != ERROR)
+		return token;
 	return IDENTIFIER;
 }
 
