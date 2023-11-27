@@ -1,4 +1,4 @@
-def serialize(huffman_tree, output_file, node_count):
+def serialize_huffman_tree(huffman_tree, output_file, node_count):
     with open(output_file, "w") as output_file:
         output_file.write(str(node_count) + '\n')
 

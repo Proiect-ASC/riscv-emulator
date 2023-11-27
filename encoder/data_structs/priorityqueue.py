@@ -1,6 +1,7 @@
 import bisect
 
 
+# basic PQ
 class PriorityQueue:
     def __init__(self, contents: list = []):  # constructor can take a list of items as default contents
         self.contents = contents
