@@ -102,8 +102,8 @@ token new_token(token_type type, const char* text)
 
 token_type get_kw_or_id(const char* text)
 {
-	token_type token = str_to_token_type(text);
-	if(token != ERROR)
+	token_type token;
+	if(hm_get(&token_hashmap, text, (int *) &token) == 0)
 		return token;
 	return IDENTIFIER;
 }

@@ -1,5 +1,5 @@
 CFLAGS=-Wall -Wextra -Iinclude
-FILES=./src/main.c ./src/parser/parser.c ./src/encoder/encoder.c ./src/encoder/treeloader.c ./src/utils/utils.c
+FILES=./src/main.c ./src/parser/*.c ./src/encoder/*.c ./src/utils/*.c
 HEADERS=./include/*
 A=sample_input.txt
 

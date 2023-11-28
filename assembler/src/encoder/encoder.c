@@ -16,8 +16,9 @@ void load_code_table(const char *file_name, char table[][MAX_CODE_LENGTH + 1])
 		char *instruction = strtok(buffer, " ");
 		char *code = strtok(NULL, " ");
 		code[strlen(code) - 1] = '\0';
-		token_type type = str_to_token_type(instruction);
-		strcpy(table[type], code);
+		token_type type;
+		if(hm_get(&token_hashmap, instruction, (int *) &type) == 0)
+			strcpy(table[type], code);
 		//printf("[DEBUG] table[%s(%d)]: %s\n", instruction, type, code);
 	}
 }

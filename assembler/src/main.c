@@ -3,6 +3,7 @@
 #include "parser.h"
 #include "treeloader.h"
 #include "encoder.h"
+#include "utils.h"
 
 // For debug only
 
@@ -68,15 +69,32 @@ char token_type_map[][20] = {
 
 void print_token_array(token_array tarr)
 {
-	printf("[DEBUG] printing token array\n");
+	printf("\n[DEBUG] printing token array\n");
 	for(uint32_t i = 0; i < tarr.size; i++)
 	{
 		printf("%s: %s\n", token_type_map[tarr.array[i].type], tarr.array[i].text);
 	}
 }
 
+void print_token_hashmap()
+{
+	printf("\n[DEBUG] printing token hashmap\n\n");
+	for(uint32_t i = 0; i < HM_CAPACITY; i++)
+	{
+		if(token_hashmap.entries[i].size != 0)
+		{
+			hmentry_t *entry = &token_hashmap.entries[i];
+			for(uint16_t j = 0; j < entry->size; j++)
+			{
+				printf("key: %s\nvalue: %d\n\n", entry->data[j].key, entry->data[j].value);
+			}
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
+	init_kw_hashmap();
 	if(argc != 2)
 	{
 		perror("[ERROR] there should be exactly one parameter");
@@ -86,5 +104,6 @@ int main(int argc, char **argv)
 	token_array tarr = lex_file(file_name);
 	print_token_array(tarr);
 	encode(tarr, "output.txt", "code_table.txt");
+	print_token_hashmap();
 }
 

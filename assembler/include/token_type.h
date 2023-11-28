@@ -1,6 +1,7 @@
 #ifndef TOKEN_TYPE_H
 #define TOKEN_TYPE_H
 #include<stdint.h>
+#include "hashmap.h"
 
 // Determines the type of the token, also used to determine dfa_node state
 
@@ -82,5 +83,9 @@ typedef struct token_array
 	uint32_t size; // Size of token array
 } token_array;
 
+extern hashmap_t token_hashmap;
+
+void init_kw_hashmap();
 
 #endif
+
