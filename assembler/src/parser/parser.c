@@ -108,6 +108,18 @@ token_type get_kw_or_id(const char* text)
 	return IDENTIFIER;
 }
 
+token_type immediate_or_label(const char *text)
+{
+	if(text[strlen(text) - 1] == ':') return LABEL;
+	for(size_t i = 0; i < strlen(text) - 1; i++)
+	{
+		if(text[i] < '0' || text[i] > '9') return LABEL;			
+	}
+	if(text[strlen(text) - 1] == 'f' || text[strlen(text) - 1] == 'b')
+		return RELLABEL;
+	return IMMEDIATE;
+}
+
 token_type get_token_type(token_type state, const char* text)
 {
 	token_type type;
@@ -120,10 +132,7 @@ token_type get_token_type(token_type state, const char* text)
 				type = get_kw_or_id(text);
 			break;
 		case IM_LB:
-			if(text[strlen(text) - 1] == ':')
-				type = LABEL;
-			else
-				type = IMMEDIATE;
+			type = immediate_or_label(text);
 			break;
 		default:
 			type = state;

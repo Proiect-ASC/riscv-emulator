@@ -64,6 +64,7 @@ typedef enum token_type
 	FSUBD,         // 54
 	LI,            // 55
 	FMVSX,		   // 56
+	RELLABEL,	   // 57
 	COUNT_TOKEN_TYPE
 } token_type;
 

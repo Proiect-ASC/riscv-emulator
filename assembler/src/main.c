@@ -64,7 +64,8 @@ char token_type_map[][20] = {
 	"FMULD",
 	"FSUBD",
 	"LI",
-	"FMVSX"
+	"FMVSX",
+	"RELLABEL"
 };
 
 void print_token_array(token_array tarr)
@@ -104,6 +105,6 @@ int main(int argc, char **argv)
 	token_array tarr = lex_file(file_name);
 	print_token_array(tarr);
 	encode(tarr, "output.txt", "code_table.txt");
-	print_token_hashmap();
+	// print_token_hashmap();
 }
 
