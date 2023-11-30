@@ -65,6 +65,9 @@ char token_type_map[][20] = {
 	"FSUBD",
 	"LI",
 	"FMVSX",
+	"RELLBJMP",
+	"SPECIFIER",
+	"SPECIFIERERR",
 	"RELLABEL"
 };
 
@@ -102,6 +105,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 	const char* file_name = argv[1];
+	printf("\n\n[DEBUG] assembling file %s...\n\n", file_name);
 	token_array tarr = lex_file(file_name);
 	print_token_array(tarr);
 	encode(tarr, "output.txt", "code_table.txt");

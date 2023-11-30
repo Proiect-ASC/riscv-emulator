@@ -50,9 +50,10 @@ dfa_node* init_dfa()
 	// COMMENT
 	add_edge(&dfa[START], new_dfa_edge(COMMENT, "#", 0));
 	add_edge(&dfa[COMMENT], new_dfa_edge(START, "\n", 0));
+	// SPECIFIER
+	add_edge(&dfa[START], new_dfa_edge(SPECIFIERERR, ".", 0));
+	add_edge(&dfa[SPECIFIERERR], new_dfa_edge(SPECIFIER, SEPARATORS, 0));
 	// LABEL
-	add_edge(&dfa[START], new_dfa_edge(LABELERR, ".", 0));
-	add_edge(&dfa[LABELERR], new_dfa_edge(LABEL, SEPARATORS, 0));
 	add_edge(&dfa[ID_KW_LBERR], new_dfa_edge(LABEL, ":", 0));
 	// IM_LB
 	add_edge(&dfa[START], new_dfa_edge(IM_LBERR, NUMBERS, 0));
@@ -110,12 +111,13 @@ token_type get_kw_or_id(const char* text)
 
 token_type immediate_or_label(const char *text)
 {
-	if(text[strlen(text) - 1] == ':') return LABEL;
 	for(size_t i = 0; i < strlen(text) - 1; i++)
 	{
 		if(text[i] < '0' || text[i] > '9') return LABEL;			
 	}
 	if(text[strlen(text) - 1] == 'f' || text[strlen(text) - 1] == 'b')
+		return RELLBJMP;
+	if(text[strlen(text) - 1] == ':')
 		return RELLABEL;
 	return IMMEDIATE;
 }
@@ -175,6 +177,7 @@ token_array lex_file(const char* file_name)
 			case COMA:
 			case ID_KW_LB:
 			case IM_LB:
+			case SPECIFIER:
 				tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token));
 				word[word_len] = '\0';
 				tarr.array[tarr.size - 1] = new_token(get_token_type(curr_state, word), word);
@@ -204,6 +207,7 @@ token_array lex_file(const char* file_name)
 			case STRINGLITERR:
 			case ID_KW_LBERR:
 			case LABELERR:
+			case SPECIFIERERR:
 			case IM_LBERR:
 				word[word_len++] = curr_char;	
 				if(word_len == word_buffer_len)

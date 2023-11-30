@@ -48,7 +48,7 @@ void encode(token_array tarr, const char *output_file_name, const char *code_tab
 	char code_table[COUNT_TOKEN_TYPE][MAX_CODE_LENGTH + 1] = {{0}};
 	char str_byte[9];
 	str_byte[9] = '\0';
-	uint32_t str_byte_index = 0;
+	uint8_t str_byte_index = 0;
 	uint8_t byte;
 	
 	load_code_table(code_table_path, code_table);
@@ -73,7 +73,7 @@ void encode(token_array tarr, const char *output_file_name, const char *code_tab
 		str_byte[str_byte_index++] = '0';
 	if(str_byte_index == 8)
 	{
-		byte = str_to_byte(str_byte);	
+		byte = str_to_byte(str_byte);
 		fwrite(&byte, 1, 1, f);
 		printf("[DEBUG] str_byte is: %s   byte is: %x\n", str_byte, byte);
 	}

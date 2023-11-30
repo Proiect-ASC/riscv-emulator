@@ -4,7 +4,6 @@
 #include "hashmap.h"
 #include <stdio.h> 
 
-
 void check_file(FILE* f, const char* file_name);
 
 #endif
