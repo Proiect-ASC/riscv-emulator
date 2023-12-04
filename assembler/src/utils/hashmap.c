@@ -48,10 +48,24 @@ int hm_get(hashmap_t *hm, const char *key, int *buffer)
 	{
 		if(strcmp(entry->data[i].key, key) == 0)
 		{
-			*buffer = entry->data[i].value;
+			if(buffer != NULL) *buffer = entry->data[i].value;
 			return 0;
 		}
 	}
-	*buffer = 0;
+	if(buffer != NULL) *buffer = 0;
 	return -1;
+}
+
+void hm_clear(hashmap_t *hm)
+{
+	// TODO: Fix
+/*	for(int i = 0; i < HM_CAPACITY; i++)
+	{
+		hmentry_t *entry = &hm->entries[i];
+		for(int j = 0; j < entry->size; j++)
+		{
+			free((char *) entry->data[j].key);
+		}
+		if(entry->size > 0) free(entry->data);
+	}*/
 }

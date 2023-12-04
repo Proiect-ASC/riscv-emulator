@@ -26,4 +26,6 @@ void hm_set(hashmap_t *hm, const char *key, int value);
 
 int hm_get(hashmap_t *hm, const char *key, int *buffer);
 
+void hm_clear(hashmap_t *hm);
+
 #endif

@@ -6,6 +6,7 @@
 #define LETTERS  "qwertyuiopasdfghjklzxcvbnm"
 #define NUMBERS "0123456789"
 #define LETANDNUM "qwertyuiopasdfghjklzxcvbnm0123456789"
+#define KWIDLBSTART "qwertyuiopasdfghjklzxcvbnm0123456789_"
 #define KWIDLB "qwertyuiopasdfghjklzxcvbnm0123456789._-"
 #define SEPARATORS " \n,()[]-"
 
@@ -55,11 +56,8 @@ dfa_node* init_dfa()
 	add_edge(&dfa[SPECIFIERERR], new_dfa_edge(SPECIFIER, SEPARATORS, 0));
 	// LABEL
 	add_edge(&dfa[ID_KW_LBERR], new_dfa_edge(LABEL, ":", 0));
-	// IM_LB
-	add_edge(&dfa[START], new_dfa_edge(IM_LBERR, NUMBERS, 0));
-	add_edge(&dfa[IM_LBERR], new_dfa_edge(IM_LB, SEPARATORS, 0));
 	// ID_KW_LB
-	add_edge(&dfa[START], new_dfa_edge(ID_KW_LBERR, KWIDLB, 0));
+	add_edge(&dfa[START], new_dfa_edge(ID_KW_LBERR, KWIDLBSTART, 0));
 	add_edge(&dfa[ID_KW_LBERR], new_dfa_edge(ID_KW_LB, SEPARATORS, 0));
 	// COMA
 	add_edge(&dfa[START], new_dfa_edge(COMA, ",", 0));
@@ -109,19 +107,6 @@ token_type get_kw_or_id(const char* text)
 	return IDENTIFIER;
 }
 
-token_type immediate_or_label(const char *text)
-{
-	for(size_t i = 0; i < strlen(text) - 1; i++)
-	{
-		if(text[i] < '0' || text[i] > '9') return LABEL;			
-	}
-	if(text[strlen(text) - 1] == 'f' || text[strlen(text) - 1] == 'b')
-		return RELLBJMP;
-	if(text[strlen(text) - 1] == ':')
-		return RELLABEL;
-	return IMMEDIATE;
-}
-
 token_type get_token_type(token_type state, const char* text)
 {
 	token_type type;
@@ -133,14 +118,19 @@ token_type get_token_type(token_type state, const char* text)
 			else
 				type = get_kw_or_id(text);
 			break;
-		case IM_LB:
-			type = immediate_or_label(text);
-			break;
 		default:
 			type = state;
 			break;
 	}
 	return type;
+}
+
+void handle_seps(token_array *tarr, token_type *curr_state, char sep, int *word_len)
+{
+	tarr->array = (token *) realloc(tarr->array, ++tarr->size * sizeof(token));
+	tarr->array[tarr->size - 1] = new_token(*curr_state, &sep);
+	*curr_state = START;
+	*word_len = 0;
 }
 
 token_array lex_file(const char* file_name)
@@ -170,13 +160,24 @@ token_array lex_file(const char* file_name)
 		switch(curr_state)
 		{
 			case LPAREN:
+				handle_seps(&tarr, &curr_state, '(', &word_len);
+				break;
 			case RPAREN:
+				handle_seps(&tarr, &curr_state, ')', &word_len);
+				break; 
 			case LSQBR:
+				handle_seps(&tarr, &curr_state, '[', &word_len);
+				break; 
 			case RSQBR:
+				handle_seps(&tarr, &curr_state, ']', &word_len);
+				break; 
 			case MINUS:
+				handle_seps(&tarr, &curr_state, '-', &word_len);
+				break; 
 			case COMA:
+				handle_seps(&tarr, &curr_state, ',', &word_len);
+				break; 
 			case ID_KW_LB:
-			case IM_LB:
 			case SPECIFIER:
 				tarr.array = (token *) realloc(tarr.array, ++tarr.size * sizeof(token));
 				word[word_len] = '\0';
