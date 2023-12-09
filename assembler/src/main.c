@@ -174,8 +174,8 @@ int main(int argc, char **argv)
 	printf("\n\n[DEBUG] assembling file %s...\n\n", file_name);
 	token_array tarr = lex_file(file_name);
 	parse(&tarr);
-	print_token_array(tarr);
-	//encode(tarr, "output.txt", "code_table.txt");
+	//print_token_array(tarr);
+	encode(&tarr, "output.txt", "code_table.txt");
 	//print_token_hashmap();
 }
 
