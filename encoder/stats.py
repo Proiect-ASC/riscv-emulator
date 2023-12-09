@@ -12,7 +12,7 @@ def read_tokens(file):
 def count_tokens(file, tokens):
     with open(file, "r") as data:
         text = data.read()
-        return {token: len(re.findall(token, text)) for token in tokens}
+        return {token: len(re.findall(rf'\b{token}\b', text)) for token in tokens}
 
 
 def compute_appearence_probabilities(tokens_counts):
