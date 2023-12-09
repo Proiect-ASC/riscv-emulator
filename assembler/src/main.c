@@ -133,7 +133,8 @@ char token_type_map[][20] = {
 	"FT8",
 	"FT9",
 	"FT10",
-	"FT11"
+	"FT11",
+	"REGISTER"
 };
 
 void print_token_array(token_array tarr)
@@ -172,6 +173,7 @@ int main(int argc, char **argv)
 	const char* file_name = argv[1];
 	printf("\n\n[DEBUG] assembling file %s...\n\n", file_name);
 	token_array tarr = lex_file(file_name);
+	parse(&tarr);
 	print_token_array(tarr);
 	//encode(tarr, "output.txt", "code_table.txt");
 	//print_token_hashmap();

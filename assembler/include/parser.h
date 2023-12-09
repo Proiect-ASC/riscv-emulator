@@ -8,4 +8,6 @@
 
 token_array lex_file(const char* file_name);
 
+void parse(token_array *tarr);
+
 #endif
