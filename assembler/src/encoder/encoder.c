@@ -78,7 +78,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 	uint16_t pc = 0;
 	char **encoded_arr = (char **) calloc(tarr->size, sizeof(char *));
 	hashmap_t label_hm;
-	uint16_t brellabel[101] = {0};
+	int brellabel[101] = {-1};
 	uint16_array frellabel[101];
 	memset(frellabel, 0, sizeof(frellabel));
 	for(size_t i = 0; i < tarr->size; i++)
@@ -134,16 +134,15 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 					frellabel[i].array = NULL;
 					frellabel[i].size = 0;
 				}
-				pc += (8 * sizeof(pc));
 				break;
 			case RELLBJMP:
 				if(text[n - 1] == 'b')
 				{
 					text[n - 1] = '\0';
 					num_val = atoi(text);
-					if(brellabel[num_val] == 0)
+					if(brellabel[num_val] == -1)
 					{
-						fprintf(stderr, "[ERROR] local symbol %s not found", text);
+						fprintf(stderr, "[ERROR] local symbol %sb not found\n", text);
 						exit(1);
 					}
 					encoded_arr[i] = buffer_to_code(&brellabel[num_val], sizeof(pc));
@@ -174,7 +173,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 	{
 		if(frellabel[i].size > 0)
 		{
-			fprintf(stderr, "[ERROR] local symbol %ld not found", i);
+			fprintf(stderr, "[ERROR] local symbol %ldf not found\n", i);
 			exit(1);
 		}
 	}

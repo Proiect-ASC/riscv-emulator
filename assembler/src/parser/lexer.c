@@ -6,7 +6,7 @@
 #define LETTERS  "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
 #define NUMBERS "0123456789"
 #define LETANDNUM "qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM"
-#define KWIDLBSTART "qwertyuiopasdfghjklzxcvbnm0123456789_QWERTYUIOPASDFGHJKLZXCVBNM"
+#define KWIDLBSTART "qwertyuiopasdfghjklzxcvbnm0123456789_QWERTYUIOPASDFGHJKLZXCVBNM-"
 #define KWIDLB "qwertyuiopasdfghjklzxcvbnm0123456789._-QWERTYUIOPASDFGHJKLZXCVBNM"
 #define SEPARATORS " \n,()[]-"
 
@@ -45,9 +45,6 @@ dfa_node* init_dfa()
 	dfa = (dfa_node *) malloc(COUNT_TOKEN_TYPE * sizeof(dfa_node));
 	memset(dfa, 0, COUNT_TOKEN_TYPE * sizeof(dfa_node));
 	add_edge(&dfa[START], new_dfa_edge(START, "\n ", 0));
-	//IMMEDIATE
-	add_edge(&dfa[START], new_dfa_edge(IMMEDIATEERR, "-", 0));
-	add_edge(&dfa[IMMEDIATEERR], new_dfa_edge(IMMEDIATE, SEPARATORS, 0));
 	// STRIGNLIT
 	add_edge(&dfa[START], new_dfa_edge(STRINGLITERR, "\"", 0));
 	add_edge(&dfa[STRINGLITERR], new_dfa_edge(STRINGLIT, "\"", 0));
