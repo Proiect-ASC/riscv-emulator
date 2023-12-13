@@ -81,7 +81,7 @@ void consume(token_array *tarr, size_t *index, token_type type)
 			t = IDENTIFIER;
 			break;
 		case IDENTIFIER:
-			if(is_immediate(text)) tarr->array[*index + 1].type = IMMEDIATE;
+			if(is_immediate(text)) tarr->array[*index + 1].type = OFFSET;
 			break;
 		default:
 			break;

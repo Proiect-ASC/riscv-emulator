@@ -114,6 +114,10 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 				encoded_arr[i] = buffer_to_code(&num_val, sizeof(pc));
 				pc += (8 * sizeof(pc));
 				break;
+			case OFFSET:
+				num_val = atoi(text);
+				encoded_arr[i] = buffer_to_code(&num_val, sizeof(pc));
+				break;
 			case RELLABEL:
 				text[n - 1] = '\0';
 				num_val = atoi(text);

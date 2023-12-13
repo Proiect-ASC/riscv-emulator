@@ -134,6 +134,7 @@ typedef enum token_type
 	FT10,
 	FT11,
 	REGISTER,
+	OFFSET,
 	COUNT_TOKEN_TYPE
 } token_type;
 

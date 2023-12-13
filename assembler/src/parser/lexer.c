@@ -142,6 +142,11 @@ token_type label_or_rellabel(char *text)
 token_array lex_file(const char* file_name)
 {
 	FILE* f = fopen(file_name, "r");
+	if(f == NULL)
+	{
+		printf("[ERROR] could not open file %s\n", file_name);
+		exit(1);
+	}
 	fseek(f, 0, SEEK_END);
 	size_t fsize = ftell(f);
 	fseek(f, 0, SEEK_SET);

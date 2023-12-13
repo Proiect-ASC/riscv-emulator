@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "parser.h"
 #include "treeloader.h"
 #include "encoder.h"
@@ -134,7 +135,8 @@ char token_type_map[][20] = {
 	"FT9",
 	"FT10",
 	"FT11",
-	"REGISTER"
+	"REGISTER",
+	"OFFSET"
 };
 
 void print_token_array(token_array tarr)
@@ -162,20 +164,29 @@ void print_token_hashmap()
 	}
 }
 
-int main(int argc, char **argv)
+int main()
 {
 	init_kw_hashmap();
-	if(argc != 2)
+	for(size_t i = 0; i < 12; i++)
 	{
-		perror("[ERROR] there should be exactly one parameter");
-		exit(1);
+		char file_name[200];
+		char extension[] = ".txt";
+		char folder_out[] = "/home/tiberiu/Documents/C/riscv-emulator/assembler/example_binaries/";
+		char folder_in[] = "/home/tiberiu/Documents/C/riscv-emulator/assembler/examples/";
+		memcpy(file_name, folder_in, sizeof(folder_in));
+		if(i + 1 > 9) file_name[sizeof(folder_in)-1] = 'A' + i - 9;
+		else file_name[sizeof(folder_in) - 1] = '1' + i;
+		strcpy(file_name + sizeof(folder_in), extension);
+		printf("[DEBUG] assembling file %s...", file_name);
+		token_array tarr = lex_file(file_name);
+		parse(&tarr);
+		print_token_array(tarr);
+		char output_file[200];
+		memcpy(output_file, folder_out, sizeof(folder_out));
+		output_file[sizeof(folder_out) - 1] = i + 1 > 9 ? 'A' + i - 9 : '1' + i;
+		strcpy(output_file + sizeof(folder_out), extension);
+		encode(&tarr, output_file, "code_table.txt");
+		printf("[DEBUG] Done\n\n");
 	}
-	const char* file_name = argv[1];
-	printf("\n\n[DEBUG] assembling file %s...\n\n", file_name);
-	token_array tarr = lex_file(file_name);
-	parse(&tarr);
-	print_token_array(tarr);
-	encode(&tarr, "output.txt", "code_table.txt");
-	//print_token_hashmap();
 }
 
