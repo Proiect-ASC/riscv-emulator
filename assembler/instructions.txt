@@ -33,3 +33,6 @@ fadd.d
 fmul.d
 fsub.d
 call printf
+call cfunc
+call scanf
+call strlen
