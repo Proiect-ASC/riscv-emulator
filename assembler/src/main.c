@@ -5,10 +5,12 @@
 #include "treeloader.h"
 #include "encoder.h"
 #include "utils.h"
+#define PROG_ARGC 3
+#define CODE_TABLE_PATH "./code_table.txt"
 
 // For debug only
 
-char token_type_map[][20] = {
+/* char token_type_map[][20] = {
 	"STRINGLIT",
 	"STRINGLITERR",
 	"IMMEDIATE",
@@ -162,12 +164,13 @@ void print_token_hashmap()
 			}
 		}
 	}
-}
+} */
 
-int main()
+int main(int argc, char **argv)
 {
 	init_kw_hashmap();
-	for(size_t i = 0; i < 12; i++)
+	// For debug only
+	/* for(size_t i = 0; i < 12; i++)
 	{
 		char file_name[200];
 		char extension[] = ".txt";
@@ -187,7 +190,19 @@ int main()
 		strcpy(output_file + sizeof(folder_out), extension);
 		encode(&tarr, output_file, "code_table.txt");
 		printf("[DEBUG] Done\n\n");
+	} */
+	if(argc != PROG_ARGC)
+	{
+		fprintf(stderr, "[ERROR] expected %d program arguments, got %d instead\n", PROG_ARGC, argc);
+		exit(1);
 	}
+	char *in_file_name = argv[1];
+	char *out_file_name = argv[2];
+	printf("[INFO] Assembling file: %s\n", in_file_name);
+	token_array tarr = lex_file(in_file_name);
+	parse(&tarr);
+	encode(&tarr, out_file_name, CODE_TABLE_PATH);
+	printf("[INFO] Done. Exiting...\n");
 	hm_clear(&token_hashmap);
 	return 0;
 }

@@ -114,4 +114,3 @@ void init_kw_hashmap()
 	token_hashmap = init_hashmap(pairs, sizeof(pairs) / sizeof(kvpair_t)); 
 }
 
-

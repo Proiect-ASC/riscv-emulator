@@ -19,8 +19,8 @@ void load_code_table(const char *file_name, char table[][MAX_CODE_LENGTH + 1])
 		token_type type;
 		if(hm_get(&token_hashmap, instruction, (int *) &type) == 0)
 			strcpy(table[type], code);
-		//printf("[DEBUG] table[%s(%d)]: %s\n", instruction, type, code);
 	}
+	fclose(f);
 }
 
 uint8_t str_to_byte(char *str)
@@ -286,7 +286,7 @@ void encode(token_array *tarr, const char *output_file_name, const char *code_ta
 			if(str_byte_index == 8)
 			{
 				byte = str_to_byte(str_byte);
-				printf("[DEBUG] str_byte is: %s byte is: %x\n", str_byte, byte);
+				//printf("[DEBUG] str_byte is: %s byte is: %x\n", str_byte, byte);
 				fwrite(&byte, 1, 1, f);
 				str_byte_index = 0;
 			}
@@ -300,7 +300,7 @@ void encode(token_array *tarr, const char *output_file_name, const char *code_ta
 	{
 		byte = str_to_byte(str_byte);
 		fwrite(&byte, 1, 1, f);
-		printf("[DEBUG] str_byte is: %s byte is: %x\n", str_byte, byte);
+		//printf("[DEBUG] str_byte is: %s byte is: %x\n", str_byte, byte);
 	}
 	fclose(f);
 }
