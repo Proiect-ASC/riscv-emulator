@@ -32,3 +32,4 @@ fsqrt.d
 fadd.d
 fmul.d
 fsub.d
+call printf
