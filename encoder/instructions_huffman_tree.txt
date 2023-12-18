@@ -1,39 +1,49 @@
-69
+75
 0
 0
-0
-0
-0 fmv.s
-1 fmv.s.x
-1
-0 ld
-1 slli
-1
-0
-0
-0 bnez
-1 fld
-1
-0
-0 fsqrt.d
-1 fadd.d
-1
-0 bgt
-1 flw
-1
-0 sd
-1 call
-1
 0 addi
 1 j
 1
 0
 0
+0 ld
+1 slli
+1
+0
+0 fsub.d
+1 call printf
+1
+0 bnez
+1 fld
+1
 0 mv
 1 ret
 1
+0
+0
 0 li
 1 add
+1
+0
+0 sd
+1 call
+1
+0
+0
+0 bgt
+1 flw
+1
+0 call strlen
+1
+0 call cfunc
+1 call scanf
+1
+0
+0 fadd.d
+1 fmul.d
+1
+0 fgt.s
+1 fsqrt.d
 1
 0
 0
@@ -56,14 +66,10 @@
 0 srai
 1 sub
 1
-0 call printf
-1
+0
 0 fadd.s
 1 fmul.s
+1 flt.s
 1
-0
-0 flt.s
-1 fgt.s
-1
-0 fmul.d
-1 fsub.d
+0 fmv.s
+1 fmv.s.x
