@@ -5,7 +5,7 @@
 
 typedef struct kvpair_t
 {
-	const char *key;
+	char *key;
 	int value;
 } kvpair_t;
 
@@ -22,9 +22,11 @@ typedef struct hashmap_t
 
 hashmap_t init_hashmap(kvpair_t *pairs, uint32_t size);
 
-void hm_set(hashmap_t *hm, const char *key, int value);
+hashmap_t init_blank_hm();
 
-int hm_get(hashmap_t *hm, const char *key, int *buffer);
+void hm_set(hashmap_t *hm, char *key, int value);
+
+int hm_get(hashmap_t *hm, char *key, int *buffer);
 
 void hm_clear(hashmap_t *hm);
 

@@ -43,7 +43,7 @@ uint8_t str_to_byte(char *str)
 
 char *buffer_to_code(void *buffer, size_t size)
 {
-	char *code = (char *) malloc(size * 8 + 1);
+	char *code = malloc(size * 8 + 1);
 	code[size * 8] = '\0';
 	size_t index = 0;
 	for(size_t i = 0; i < size; i++)
@@ -63,7 +63,7 @@ char *buffer_to_code(void *buffer, size_t size)
 void wtea(char **dest, char *code)
 {
 	size_t n = strlen(code);
-	*dest = (char *) malloc(n + 1);
+	*dest = malloc(n + 1);
 	strcpy(*dest, code);
 }
 
@@ -73,14 +73,28 @@ typedef struct uint16_array
 	size_t size;
 } uint16_array;
 
-char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1])
+typedef enum directive
+{
+	RODATA,
+	TEXT,
+	LONG,
+	ASCII,
+	ASCIZ,
+	BYTE,
+	GLOBAL,
+	WORD,
+	DIRECTIVE_COUNT
+} directive;
+
+char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1], uint16_t *program_start, uint8_t *remainder)
 {
 	uint16_t pc = 0;
-	char **encoded_arr = (char **) calloc(tarr->size, sizeof(char *));
-	hashmap_t label_hm;
+	char **encoded_arr = calloc(tarr->size, sizeof(*encoded_arr));
+	hashmap_t label_hm = init_blank_hm();
 	int brellabel[101] = {-1};
 	uint16_array frellabel[101];
 	memset(frellabel, 0, sizeof(frellabel));
+	directive dir = DIRECTIVE_COUNT;
 	for(size_t i = 0; i < tarr->size; i++)
 	{
 		char *text = (char *) tarr->array[i].text;
@@ -91,12 +105,29 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 		{
 			case STRINGLIT:
 				text[n - 1] = '\0';
-				encoded_arr[i] = buffer_to_code(text + 1, n - 2);
+				if(dir == ASCII) encoded_arr[i] = buffer_to_code(text + 1, n - 2);
+				else if(dir == ASCIZ) encoded_arr[i] = buffer_to_code(text + 1, n - 1);
+				else
+				{
+					fprintf(stderr, "[ERROR] dirrective %d not compatible with STRINGLIT\n", dir);
+					exit(1);
+				}
 				pc += strlen(encoded_arr[i]);
 				break;
 			case IMMEDIATE:
 				num_val = atoi(text);
-				encoded_arr[i] = buffer_to_code(&num_val, sizeof(num_val));
+				switch(dir)
+				{
+					case BYTE:
+						encoded_arr[i] = buffer_to_code(&num_val, 1);
+						break;
+					case WORD:
+						encoded_arr[i] = buffer_to_code(&num_val, 2);
+						break;
+					default:
+						encoded_arr[i] = buffer_to_code(&num_val, sizeof(num_val));
+						break;
+				}
 				pc += strlen(encoded_arr[i]);
 				break;
 			case LABEL:
@@ -104,11 +135,10 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 				hm_set(&label_hm, text, (int) pc);
 				break;
 			case IDENTIFIER:
-				if(hm_get(&label_hm, text, &num_val) == -1)
+				if(dir == GLOBAL) break;
+				if(hm_get(&label_hm, text, &num_val) == -1 && strcmp(text, "printf") != 0)
 				{
-					// TODO: Fix this when able
-					break;
-					fprintf(stderr, "[ERROR] symbol %s not found\n", text);
+					fprintf(stderr, "[ERROR] symbol %s could not be linked\n", text);
 					exit(1);
 				}
 				encoded_arr[i] = buffer_to_code(&num_val, sizeof(pc));
@@ -134,7 +164,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 					{
 						encoded_arr[frellabel[i].array[j]] = buffer_to_code(&pc, sizeof(pc));
 					}
-					if(frellabel[i].array != NULL) free(frellabel[i].array);
+					free(frellabel[i].array);
 					frellabel[i].array = NULL;
 					frellabel[i].size = 0;
 				}
@@ -155,7 +185,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 				{
 					text[n - 1] = '\0';
 					num_val = atoi(text);
-					frellabel[num_val].array = (uint16_t *) realloc(frellabel[num_val].array, ++frellabel[num_val].size * 2);
+					frellabel[num_val].array = realloc(frellabel[num_val].array, ++frellabel[num_val].size * 2);
 					frellabel[num_val].array[frellabel[num_val].size - 1] = i;
 				}
 				pc += (8 * sizeof(pc));
@@ -166,6 +196,17 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 			case RSQBR:
 			case COMA:
 			case SPECIFIER:
+				if(strcmp(text, ".text") == 0)
+				{
+					dir = TEXT;
+					*program_start = pc;
+				}
+				else if(strcmp(text, ".rodata") == 0) dir = RODATA;
+				else if(strcmp(text, ".global") == 0) dir = GLOBAL;
+				else if(strcmp(text, ".long") == 0) dir = LONG;
+				else if(strcmp(text, ".ascii") == 0) dir = ASCII;
+				else if(strcmp(text, ".asciz") == 0) dir = ASCIZ;
+				else if(strcmp(text, ".byte") == 0) dir = BYTE;
 				break;
 			default:
 				wtea(&encoded_arr[i], code_table[type]);
@@ -175,12 +216,16 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 	}
 	for(size_t i = 1; i < 101; i++)
 	{
+		if(frellabel[i].array != NULL)
+			free(frellabel[i].array);
 		if(frellabel[i].size > 0)
 		{
 			fprintf(stderr, "[ERROR] local symbol %ldf not found\n", i);
 			exit(1);
 		}
 	}
+	hm_clear(&label_hm);
+	*remainder = (8 - pc % 8) % 8;
 	return encoded_arr;
 }
 
@@ -193,9 +238,13 @@ void encode(token_array *tarr, const char *output_file_name, const char *code_ta
 	str_byte[9] = '\0';
 	uint8_t str_byte_index = 0;
 	uint8_t byte = 0;
+	uint8_t remainder = 0;
+	uint16_t program_start = 0;
 
 	load_code_table(code_table_path, code_table);
-	char **encoded_arr = tarr_to_encoded(tarr, code_table);
+	char **encoded_arr = tarr_to_encoded(tarr, code_table, &program_start, &remainder);
+	fwrite(&remainder, 1, 1, f);
+	fwrite(&program_start, 2, 1, f);
 	for(uint32_t i = 0; i < tarr->size; i++)
 	{
 		size_t code_index = 0;

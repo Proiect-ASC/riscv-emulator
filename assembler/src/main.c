@@ -188,5 +188,7 @@ int main()
 		encode(&tarr, output_file, "code_table.txt");
 		printf("[DEBUG] Done\n\n");
 	}
+	hm_clear(&token_hashmap);
+	return 0;
 }
 

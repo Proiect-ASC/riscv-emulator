@@ -214,6 +214,31 @@ token_array lex_file(const char* file_name)
 			case IM_LBERR:
 			case IMMEDIATEERR:
 				word[word_len++] = curr_char;	
+				if(curr_state == STRINGLITERR && word_len > 1 && word[word_len - 2] == '\\')
+				{
+					word_len--;
+					switch(curr_char)
+					{
+						case 'n':
+							word[word_len - 1] = '\n';
+							break;
+						case '\\':
+							word[word_len - 1] = '\\';
+							break;
+						case 't':
+							word[word_len - 1] = '\t';
+							break;
+						case '\'':
+							word[word_len - 1] = '\'';
+							break;
+						case '\"':
+							word[word_len - 1] = '\"';
+							break;
+						default:
+							fprintf(stderr, "[ERROR] invalid character \\%c\n", curr_char);
+							exit(1);
+					}
+				}
 				if(word_len == word_buffer_len)
 				{
 					perror("[ERROR] word buffer overflow\n");
