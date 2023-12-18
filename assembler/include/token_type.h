@@ -135,6 +135,10 @@ typedef enum token_type
 	FT11,
 	REGISTER,
 	OFFSET,
+	CALLPRINTF,
+	CALLSCANF,
+	CALLCFUNC,
+	CALLSTRLEN,
 	COUNT_TOKEN_TYPE
 } token_type;
 

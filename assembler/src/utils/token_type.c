@@ -105,7 +105,11 @@ void init_kw_hashmap()
 		{ "ft8", FT8 },
 		{ "ft9", FT9 },
 		{ "ft10", FT10 },
-		{ "ft1", FT11 }
+		{ "ft1", FT11 },
+		{ "callprintf", CALLPRINTF },
+		{ "callscanf", CALLSCANF },
+		{ "callcfunc", CALLCFUNC },
+		{ "callstrlen", CALLSTRLEN }
 	};
 	token_hashmap = init_hashmap(pairs, sizeof(pairs) / sizeof(kvpair_t)); 
 }
