@@ -9,7 +9,6 @@ ret
 sb
 bge
 sd
-call
 srai
 sub
 ld
@@ -33,6 +32,7 @@ fadd.d
 fmul.d
 fsub.d
 call printf
-call cfunc
 call scanf
 call strlen
+call cfunc
+call intern

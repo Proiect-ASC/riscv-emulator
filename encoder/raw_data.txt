@@ -324,3 +324,18 @@ addi a0, a0, 4 # Move to next destination
 j 1b
 1:
 ret
+
+// Extending the data
+// 12 mock intern calls
+call intern
+call intern
+call intern
+call intern
+call intern
+call intern
+call intern
+call intern
+call intern
+call intern
+call intern
+call intern
