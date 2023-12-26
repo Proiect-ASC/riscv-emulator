@@ -1,10 +1,8 @@
 #include "processor.h"
-#include "treeloader.h"
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 
-void save_state(processor_t *proc, char *state_file_handle) {
+void save_state(const processor_t *proc, const char *state_file_handle) {
     FILE *state_file = fopen(state_file_handle, "w");
     fwrite(proc->ram, 1, RAM_SIZE, state_file);
     fwrite(&proc->program_counter, 2, 1, state_file);
@@ -12,7 +10,7 @@ void save_state(processor_t *proc, char *state_file_handle) {
     fwrite(proc->float_registers, 4, 32, state_file);
 }
 
-void load_state(processor_t *proc, char *state_file_handle) {
+void load_state(processor_t *proc, const char *state_file_handle) {
     FILE *state_file = fopen(state_file_handle, "r");
     fread(proc->ram, 1, RAM_SIZE, state_file);
     fread(&proc->program_counter, 2, 1, state_file);
@@ -20,7 +18,7 @@ void load_state(processor_t *proc, char *state_file_handle) {
     fread(proc->float_registers, 4, 32, state_file);
 }
 
-binary load_executable(char *file_handle) {
+binary load_executable(const char *file_handle) {
     FILE *binary_file = fopen(file_handle, "r");
     binary program;
     fread(&program.remainder, 1, 1, binary_file);
@@ -31,57 +29,105 @@ binary load_executable(char *file_handle) {
     return program;
 }
 
-void run(processor_t *proc, binary *program) {
+extern inline uint16_t get_address(processor_t *proc) {
+    uint16_t addr = 0;
+    for (int i = 0; i < ADDRESS_LENGHT; ++i) {
+        uint16_t curr_byte = proc->program_counter / 8;
+        if (proc->ram[curr_byte] & (1 << (7 - proc->program_counter++ % 8))) {
+            addr += (1 << (7 - i % 8 + (i / 8) * 8));
+        }
+    }
+    return addr;
+}
+
+extern inline uint8_t get_register(processor_t *proc, const huffman_tree *register_tree) {
+    uint8_t index = 0;
+    while (register_tree->nodes[index].value == -1) {
+        uint16_t curr_byte = proc->program_counter / 8;
+        if (proc->ram[curr_byte] & (1 << (7 - proc->program_counter++ % 8))) {
+            index = register_tree->nodes[index].right_index;
+        }
+        else {
+            index = register_tree->nodes[index].left_index;
+        }
+    }
+    return register_tree->nodes[index].value;
+}
+
+extern inline int get_int_immediate(processor_t *proc, uint8_t length) {
+    int val = 0;
+    for (int i = 0; i < length; ++i) {
+        uint16_t curr_byte = proc->program_counter / 8;
+        if (proc->ram[curr_byte] & (1 << (7 - proc->program_counter++ % 8))) {
+            val += (1 << (7 - i % 8 + (i / 8) * 8));
+        }
+    }
+    return val;
+}
+
+extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length) {
+    for (int i = 0; i < length; ++i) {
+        uint16_t curr_byte = proc->program_counter / 8;
+        proc->ram[curr_byte] &= ((uint8_t)0xFF ^ (1 << (7 - proc->program_counter % 8)));
+        if (imm & (1 << (7 - i % 8 + (i / 8) * 8))) {
+            proc->ram[curr_byte] |= (1 << (7 - proc->program_counter % 8));
+        }
+        proc->program_counter++;
+    }
+}
+
+void run(processor_t *proc, const binary *program) {
     huffman_tree instruction_tree = load_huffman_tree("../huffman_trees/instructions_huffman_tree.txt", false),
         register_tree = load_huffman_tree("../huffman_trees/registers_huffman_tree.txt", true);
     void *instruction_labels[] = {
-            &&li,
-            &&add,
-            &&lb,
-            &&beqz,
             &&addi,
             &&j,
-            &&mv,
-            &&ret,
-            &&sb,
-            &&bge,
-            &&sd,
-            &&srai,
-            &&sub,
-            &&ld,
             &&slli,
             &&lw,
             &&ble,
             &&bnez,
-            &&fld,
-            &&fsw,
-            &&la,
-            &&bgt,
-            &&flw,
-            &&fadd_s,
-            &&fmul_s,
-            &&fmv_s,
-            &&fmv_s_x,
-            &&flt_s,
-            &&fgt_s,
-            &&fsqrt_d,
-            &&fadd_d,
-            &&fmul_d,
-            &&fsub_d,
-            &&call_printf,
+            &&call_cfunc,
             &&call_scanf,
             &&call_strlen,
-            &&call_cfunc,
-            &&call_intern
+            &&fadd_d,
+            &&fmul_d,
+            &&fgt_s,
+            &&fsqrt_d,
+            &&mv,
+            &&ret,
+            &&li,
+            &&add,
+            &&call_intern,
+            &&flw,
+            &&fadd_s,
+            &&fmv_s_x,
+            &&flt_s,
+            &&sub,
+            &&ld,
+            &&lb,
+            &&beqz,
+            &&sb,
+            &&bge,
+            &&fld,
+            &&fsw,
+            &&fmul_s,
+            &&fmv_s,
+            &&fsub_d,
+            &&call_printf,
+            &&la,
+            &&bgt,
+            &&sd,
+            &&srai
     };
     proc->program_counter = program->program_start;
     uint16_t program_end = program->program_end;
+    proc->int_registers[19] = program_end + 1; //return addres (ra) to program end + 1 from the test examples, because no main is defined
     memcpy(proc->ram, program->content, RAM_SIZE);
     uint8_t index = 0;
     next_instr:
         while (instruction_tree.nodes[index].value == -1) {
-            int curr_byte = proc->program_counter / 8;
-            if (proc->ram[curr_byte] & (1 << (proc->program_counter++ % 8))) {
+            uint16_t curr_byte = proc->program_counter / 8;
+            if (proc->ram[curr_byte] & (1 << (7 - proc->program_counter++ % 8))) {
                 index = instruction_tree.nodes[index].right_index;
             }
             else {
@@ -92,55 +138,92 @@ void run(processor_t *proc, binary *program) {
         index = 0;
         goto *instruction_labels[jump_index];
     li:
-        // TODO: implement
+        ;
+        int rd_li = get_register(proc, &register_tree);
+        int imm_li = get_int_immediate(proc, 32);
+        proc->int_registers[rd_li] = imm_li;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     add:
-        // TODO: implement
+        ;
+        int rd_add = get_register(proc, &register_tree);
+        int rs1_add = get_register(proc, &register_tree);
+        int rs2_add = get_register(proc, &register_tree);
+        proc->int_registers[rd_add] = proc->int_registers[rs1_add] + proc->int_registers[rs2_add];
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     lb:
-        // TODO: implement
+        ;
+        int rd_lb = get_register(proc, &register_tree);
+        int dest_addr_lb = get_address(proc);
+        int dest_addr_reg_lb = get_register(proc, &register_tree);
+        int return_addr_lb = proc->program_counter;
+        proc->program_counter = dest_addr_lb + proc->int_registers[dest_addr_reg_lb];
+        int imm_lb = get_int_immediate(proc, 8);
+        proc->program_counter = return_addr_lb;
+        //nifty cast trick to sign extend an 8 bit imm
+        imm_lb = (int8_t)imm_lb;
+        imm_lb = (int)imm_lb;
+        proc->int_registers[rd_lb] = imm_lb;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     beqz:
-        // TODO: implement
+        ;
+        int rd_beqz = get_register(proc, &register_tree);
+        int dest_addr_beqz = get_address(proc);
+        if (proc->int_registers[rd_beqz] == 0) proc->program_counter = dest_addr_beqz;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     addi:
-        // TODO: implement
+        ;
+        int rd_addi = get_register(proc, &register_tree);
+        int rs1_addi = get_register(proc, &register_tree);
+        int imm_addi = get_int_immediate(proc, 32);
+        proc->int_registers[rd_addi] = proc->int_registers[rs1_addi] + imm_addi;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     j:
-        // TODO: implement
+        ;
+        int dest_addr_j = get_address(proc);
+        proc->program_counter = dest_addr_j;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     mv:
-        // TODO: implement
+        ;
+        int rd_mv = get_register(proc, &register_tree);
+        int rs1_mv = get_register(proc, &register_tree);
+        proc->int_registers[rd_mv] = proc->int_registers[rs1_mv];
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     ret:
-        // TODO: implement
+        proc->program_counter = proc->int_registers[19];
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     sb:
-        // TODO: implement
+        ;
+        int rd_sb = get_register(proc, &register_tree);
+        int dest_addr_sb = get_address(proc);
+        int dest_addr_reg_sb = get_register(proc, &register_tree);
+        int return_addr_sb = proc->program_counter;
+        proc->program_counter = dest_addr_sb + proc->int_registers[dest_addr_reg_sb];
+        put_int_immediate(proc, proc->int_registers[rd_sb], 8);
+        proc->program_counter = return_addr_sb;
         if (proc->program_counter > program_end) {
             goto end;
         }
