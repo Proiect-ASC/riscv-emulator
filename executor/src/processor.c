@@ -229,7 +229,11 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     bge:
-        // TODO: implement
+        ; 
+        int r1_bge = get_register(proc, &register_tree);
+        int r2_bge = get_register(proc, &register_tree);
+        int dest_addr_bge = get_address(proc);
+        if (proc->int_registers[r1_bge] >= proc->int_register[r2_bge]) proc->program_counter = dest_addr_bge;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -247,7 +251,11 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     sub:
-        // TODO: implement
+        ;
+        int rd_sub = get_register(proc, &register_tree);
+        int rs1_sub = get_register(proc, &register_tree);
+        int rs2_sub = get_register(proc, &register_tree);
+        proc->int_registers[rd_sub] = proc->int_registers[rs2_sub] - proc->int_registers[rs1_sub];
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -271,13 +279,20 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     ble:
-        // TODO: implement
+        ; 
+        int r1_ble = get_register(proc, &register_tree);
+        int r2_ble = get_register(proc, &register_tree);
+        int dest_addr_ble = get_address(proc);
+        if (proc->int_registers[r1_ble] <= proc->int_register[r2_ble]) proc->program_counter = dest_addr_ble;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     bnez:
-        // TODO: implement
+        ;
+        int rd_bnez = get_register(proc, &register_tree);
+        int dest_addr_bnez = get_address(proc);
+        if (proc->int_registers[rd_bnez] != 0) proc->program_counter = dest_addr_bnez;
         if (proc->program_counter > program_end) {
             goto end;
         }
