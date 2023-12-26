@@ -101,6 +101,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 		token_type type = tarr->array[i].type;
 		size_t n = strlen(text);
 		int num_val = 0;
+		//printf("[DEBUG] pc is %hhu, token text is \"%s\", token id is %d\n", pc, text, type);
 		switch(type)
 		{
 			case STRINGLIT:
@@ -178,6 +179,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 			case OFFSET:
 				num_val = atoi(text);
 				encoded_arr[i] = buffer_to_code(&num_val, sizeof(pc));
+				pc += (8 * sizeof(pc));
 				break;
 			case RELLABEL:
 				text[n - 1] = '\0';
