@@ -77,8 +77,20 @@ extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length)
 }
 
 void run(processor_t *proc, const binary *program) {
-    huffman_tree instruction_tree = load_huffman_tree("../huffman_trees/instructions_huffman_tree.txt", false),
-        register_tree = load_huffman_tree("../huffman_trees/registers_huffman_tree.txt", true);
+    int instruction_indices[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                                 19, 20, 21, 22, 23, 24, 25, 26, 27,
+                                 28, 29, 30, 31, 32, 33, 34, 35, 36,
+                                 37};
+    int register_indices[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                              10, 11, 12, 13, 14, 15, 16, 17, 18,
+                              19, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                              10, 11, 12, 13, 14, 15, 16, 17, 18,
+                              19, 20, 21, 22, 23, 24, 20, 21, 25, 26,
+                              22, 23, 27, 28, 24, 25, 29, 30, 26, 27,
+                              28, 29, 31, 30, 31};
+    huffman_tree instruction_tree = load_huffman_tree("../huffman_trees/instructions_huffman_tree.txt", instruction_indices),
+        register_tree = load_huffman_tree("../huffman_trees/registers_huffman_tree.txt", register_indices);
     void *instruction_labels[] = {
             &&addi,
             &&j,
@@ -233,7 +245,7 @@ void run(processor_t *proc, const binary *program) {
         int r1_bge = get_register(proc, &register_tree);
         int r2_bge = get_register(proc, &register_tree);
         int dest_addr_bge = get_address(proc);
-        if (proc->int_registers[r1_bge] >= proc->int_register[r2_bge]) proc->program_counter = dest_addr_bge;
+        if (proc->int_registers[r1_bge] >= proc->int_registers[r2_bge]) proc->program_counter = dest_addr_bge;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -283,7 +295,7 @@ void run(processor_t *proc, const binary *program) {
         int r1_ble = get_register(proc, &register_tree);
         int r2_ble = get_register(proc, &register_tree);
         int dest_addr_ble = get_address(proc);
-        if (proc->int_registers[r1_ble] <= proc->int_register[r2_ble]) proc->program_counter = dest_addr_ble;
+        if (proc->int_registers[r1_ble] <= proc->int_registers[r2_ble]) proc->program_counter = dest_addr_ble;
         if (proc->program_counter > program_end) {
             goto end;
         }

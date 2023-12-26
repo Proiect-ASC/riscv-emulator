@@ -18,6 +18,6 @@ typedef struct huffman_tree
 	uint8_t size;
 } huffman_tree;
 
-huffman_tree load_huffman_tree(const char *file_name, bool instr_or_registers);
+huffman_tree load_huffman_tree(const char *file_name, int* indices);
 
 #endif
