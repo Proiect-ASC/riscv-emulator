@@ -1,10 +1,12 @@
 #ifndef HUFFMAN_TREE_LOADER_H
 #define HUFFMAN_TREE_LOADER_H
 #include <stdint.h>
+#include <stdbool.h>
+#define MAX_CODE_LENGHT 32
 
 typedef struct huffman_node
 {
-	const char *name;
+	int value;
 	const char *code;
 	int8_t left_index;
 	int8_t right_index;
@@ -12,10 +14,10 @@ typedef struct huffman_node
 
 typedef struct huffman_tree
 {
-	huffman_node* root;
+	huffman_node* nodes;
 	uint8_t size;
 } huffman_tree;
 
-huffman_tree load_huffman_tree(const char *file_name);
+huffman_tree load_huffman_tree(const char *file_name, bool instr_or_registers);
 
 #endif
