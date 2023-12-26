@@ -29,6 +29,7 @@ binary load_executable(const char *file_handle);
 extern inline uint8_t get_register(processor_t *proc, const huffman_tree *register_tree);
 extern inline uint16_t get_address(processor_t *proc);
 extern inline int get_int_immediate(processor_t *proc, uint8_t length);
+extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length);
 void run(processor_t *proc, const binary *program);
 
 #endif //EXECUTOR_PROCESSOR_H

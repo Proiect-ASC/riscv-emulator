@@ -65,6 +65,17 @@ extern inline int get_int_immediate(processor_t *proc, uint8_t length) {
     return val;
 }
 
+extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length) {
+    for (int i = 0; i < length; ++i) {
+        uint16_t curr_byte = proc->program_counter / 8;
+        proc->ram[curr_byte] &= ((uint8_t)0xFF ^ (1 << (7 - proc->program_counter % 8)));
+        if (imm & (1 << (7 - i % 8 + (i / 8) * 8))) {
+            proc->ram[curr_byte] |= (1 << (7 - proc->program_counter % 8));
+        }
+        proc->program_counter++;
+    }
+}
+
 void run(processor_t *proc, const binary *program) {
     huffman_tree instruction_tree = load_huffman_tree("../huffman_trees/instructions_huffman_tree.txt", false),
         register_tree = load_huffman_tree("../huffman_trees/registers_huffman_tree.txt", true);
@@ -205,7 +216,14 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     sb:
-        // TODO: implement
+        ;
+        int rd_sb = get_register(proc, &register_tree);
+        int dest_addr_sb = get_address(proc);
+        int dest_addr_reg_sb = get_register(proc, &register_tree);
+        int return_addr_sb = proc->program_counter;
+        proc->program_counter = dest_addr_sb + proc->int_registers[dest_addr_reg_sb];
+        put_int_immediate(proc, proc->int_registers[rd_sb], 8);
+        proc->program_counter = return_addr_sb;
         if (proc->program_counter > program_end) {
             goto end;
         }
