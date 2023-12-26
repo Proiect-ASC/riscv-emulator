@@ -77,6 +77,11 @@ extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length)
 }
 
 void run(processor_t *proc, const binary *program) {
+    /* to match instructions or registers to indices, look up the huffman tree and match, in order, each item with the
+     * respective position in the array, n-th item to n-th array position, such as
+     * a4 ... register_indices[4] = 4 (because a4 is the 5th int register to appear)
+     * or
+     * fa3 ... register_indices[20] = 0 (because fa3 is the first float register to appear but the 21th overall) */
     int instruction_indices[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                                  10, 11, 12, 13, 14, 15, 16, 17, 18,
                                  19, 20, 21, 22, 23, 24, 25, 26, 27,
