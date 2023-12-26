@@ -183,7 +183,7 @@ int main(int argc, char **argv)
 		printf("[DEBUG] assembling file %s...", file_name);
 		token_array tarr = lex_file(file_name);
 		parse(&tarr);
-		print_token_array(tarr);
+		//print_token_array(tarr);
 		char output_file[200];
 		memcpy(output_file, folder_out, sizeof(folder_out));
 		output_file[sizeof(folder_out) - 1] = i + 1 > 9 ? 'A' + i - 9 : '1' + i;
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 	printf("[INFO] Assembling file: %s\n", in_file_name);
 	token_array tarr = lex_file(in_file_name);
 	parse(&tarr);
-	encode(&tarr, out_file_name, CODE_TABLE_PATH);
+	encode(&tarr, out_file_name, CODE_TABLE_PATH); 
 	printf("[INFO] Done. Exiting...\n");
 	hm_clear(&token_hashmap);
 	return 0;
