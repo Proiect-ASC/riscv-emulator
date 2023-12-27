@@ -76,6 +76,31 @@ extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length)
     }
 }
 
+extern inline float get_float_immediate(processor_t *proc) {
+    intfloat val;
+    val.i = 0;
+    for (int i = 0; i < 32; ++i) {
+        uint16_t curr_byte = proc->program_counter / 8;
+        if (proc->ram[curr_byte] & (1 << (7 - proc->program_counter++ % 8))) {
+            val.i += (1 << (7 - i % 8 + (i / 8) * 8));
+        }
+    }
+    return val.f;
+}
+
+extern inline void put_float_immediate(processor_t *proc, float imm) {
+    intfloat val;
+    val.f = imm;
+    for (int i = 0; i < 32; ++i) {
+        uint16_t curr_byte = proc->program_counter / 8;
+        proc->ram[curr_byte] &= ((uint8_t)0xFF ^ (1 << (7 - proc->program_counter % 8)));
+        if (val.i & (1 << (7 - i % 8 + (i / 8) * 8))) {
+            proc->ram[curr_byte] |= (1 << (7 - proc->program_counter % 8));
+        }
+        proc->program_counter++;
+    }
+}
+
 void run(processor_t *proc, const binary *program) {
     /* to match instructions or registers to indices, look up the huffman tree and match, in order, each item with the
      * respective position in the array, n-th item to n-th array position, such as

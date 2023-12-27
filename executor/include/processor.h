@@ -23,6 +23,11 @@ typedef struct processor_t {
     float float_registers[FLOAT_REG_COUNT];
 } processor_t;
 
+typedef union intfloat {
+    int32_t i;
+    float f;
+} intfloat;
+
 void save_state(const processor_t *proc, const char *state_file_handle);
 void load_state(processor_t *proc, const char *state_file_handle);
 binary load_executable(const char *file_handle);
@@ -30,6 +35,8 @@ extern inline uint8_t get_register(processor_t *proc, const huffman_tree *regist
 extern inline uint16_t get_address(processor_t *proc);
 extern inline int get_int_immediate(processor_t *proc, uint8_t length);
 extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length);
+extern inline float get_float_immediate(processor_t *proc);
+extern inline void put_float_immediate(processor_t *proc, float imm);
 void run(processor_t *proc, const binary *program);
 
 #endif //EXECUTOR_PROCESSOR_H
