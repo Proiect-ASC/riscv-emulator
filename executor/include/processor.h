@@ -28,6 +28,11 @@ typedef union intfloat {
     float f;
 } intfloat;
 
+typedef union signedunsigned {
+    int32_t s;
+    uint32_t u;
+} signedunsigned;
+
 void save_state(const processor_t *proc, const char *state_file_handle);
 void load_state(processor_t *proc, const char *state_file_handle);
 binary load_executable(const char *file_handle);

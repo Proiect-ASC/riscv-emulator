@@ -190,7 +190,7 @@ void run(processor_t *proc, const binary *program) {
         goto next_instr;
     add:
         ;
-        int rd_add = get_register(pr-oc, &register_tree);
+        int rd_add = get_register(proc, &register_tree);
         int rs1_add = get_register(proc, &register_tree);
         int rs2_add = get_register(proc, &register_tree);
         proc->int_registers[rd_add] = proc->int_registers[rs1_add] + proc->int_registers[rs2_add];
@@ -287,7 +287,7 @@ void run(processor_t *proc, const binary *program) {
         int dest_addr_reg_sd = get_register(proc, &register_tree);
         int return_addr_sd = proc->program_counter;
         proc->program_counter = dest_addr_sd + proc->int_registers[dest_addr_reg_sd];
-        put_int_immediate(proc, proc->int_registers[rd_sd], 64);
+        put_int_immediate(proc, proc->int_registers[rd_sd], 32);
         proc->program_counter = return_addr_sd;
         if (proc->program_counter > program_end) {
             goto end;
@@ -297,9 +297,10 @@ void run(processor_t *proc, const binary *program) {
         ;
         int rs_srai = get_register(proc, &register_tree);
         int rd_srai = get_register(proc, &register_tree);
-        int imm_srai = get_int_immediate(proc, 6);
-        int bit_mask = (1 << 31) & rs_srai;
-        proc->int_registers[rd_srai] = (proc->int_registers[rs_srai] >> imm_srai) | bit_mask;
+        int imm_srai = get_int_immediate(proc, 32);
+        signedunsigned bitmask;
+        bitmask.u = ~(~0U >> imm_srai);
+        proc->int_registers[rd_srai] = (proc->int_registers[rs_srai] >> imm_srai) | bitmask.s;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -324,7 +325,7 @@ void run(processor_t *proc, const binary *program) {
         ;
         int rd_slli = get_register(proc, &register_tree);
         int rs_slli = get_register(proc, &register_tree);
-        int imm_slli = get_int_immediate(proc, 6);
+        int imm_slli = get_int_immediate(proc, 32);
         proc->int_registers[rd_slli] = proc->int_registers[rs_slli] << imm_slli;
         if (proc->program_counter > program_end) {
             goto end;
@@ -373,10 +374,10 @@ void run(processor_t *proc, const binary *program) {
         ;
         int rs_fsw = get_register(proc, &register_tree);
         int dest_addr_fsw = get_address(proc);
-        int dest_addr_reg_fsw = get_register(proc, &register_tree);
+        uint16_t dest_addr_reg_fsw = get_register(proc, &register_tree);
         int return_addr_fsw = proc->program_counter;
-        proc->program_counter = dest_addr_fsw + proc->float_registers[dest_addr_reg_fsw];
-        put_int_immediate(proc, proc->float_registers[rs_fsw], 32);
+        proc->program_counter = dest_addr_fsw + proc->int_registers[dest_addr_reg_fsw];
+        put_float_immediate(proc, proc->float_registers[rs_fsw]);
         proc->program_counter = return_addr_fsw;
         if (proc->program_counter > program_end) {
             goto end;
@@ -385,7 +386,7 @@ void run(processor_t *proc, const binary *program) {
     la:
         ;
         int rd_la = get_register(proc, &register_tree);
-        int source_load_address = get_adress(proc);
+        int source_load_address = get_address(proc);
         proc->int_registers[rd_la] = source_load_address;
         if (proc->program_counter > program_end) {
             goto end;
@@ -403,12 +404,12 @@ void run(processor_t *proc, const binary *program) {
         goto next_instr;
     flw:
         ;
-        float rd_flw = get_register(proc, &register_tree);
-        float dest_addr_flw = get_address(proc);
-        float dest_addr_reg_flw = get_register(proc, &register_tree);
-        float return_addr_flw = proc->program_counter;
-        proc->program_counter = dest_addr_flw + proc->float_registers[dest_addr_reg_flw];
-        float imm_flw = get_int_immediate(proc, 32);
+        int rd_flw = get_register(proc, &register_tree);
+        uint16_t dest_addr_flw = get_address(proc);
+        int dest_addr_reg_flw = get_register(proc, &register_tree);
+        int return_addr_flw = proc->program_counter;
+        proc->program_counter = dest_addr_flw + proc->int_registers[dest_addr_reg_flw];
+        float imm_flw = get_float_immediate(proc);
         proc->program_counter = return_addr_flw;
         proc->float_registers[rd_flw] = imm_flw;
         if (proc->program_counter > program_end) {
@@ -417,9 +418,9 @@ void run(processor_t *proc, const binary *program) {
         goto next_instr;
     fadd_s:
         ;
-        float rd_fadd_s = get_register(proc, &register_tree);
-        float rs1_fadd_s = get_register(proc, &register_tree);
-        float rs2_fadd_s = get_register(proc, &register_tree);
+        int rd_fadd_s = get_register(proc, &register_tree);
+        int rs1_fadd_s = get_register(proc, &register_tree);
+        int rs2_fadd_s = get_register(proc, &register_tree);
         proc->float_registers[rd_fadd_s] = proc->float_registers[rs1_fadd_s] + proc->float_registers[rs2_fadd_s];
         if (proc->program_counter > program_end) {
             goto end;
@@ -433,8 +434,8 @@ void run(processor_t *proc, const binary *program) {
         goto next_instr;
     fmv_s:
         ;
-        float rd_fmv_s = get_register(proc, &register_tree);
-        float rs_fmv_s = get_register(proc, &register_tree);
+        int rd_fmv_s = get_register(proc, &register_tree);
+        int rs_fmv_s = get_register(proc, &register_tree);
         proc->float_registers[rd_fmv_s] = proc->float_registers[rs_fmv_s];
         if (proc->program_counter > program_end) {
             goto end;
@@ -448,9 +449,9 @@ void run(processor_t *proc, const binary *program) {
         goto next_instr;
     flt_s:
         ;
-        float rd_flt_s = get_register(proc, &register_tree);
-        float rs1_flt_s = get_register(proc, &register_tree);
-        float rs2_flt_s = get_register(proc, &register_tree);
+        int rd_flt_s = get_register(proc, &register_tree);
+        int rs1_flt_s = get_register(proc, &register_tree);
+        int rs2_flt_s = get_register(proc, &register_tree);
         if (proc->float_registers[rs1_flt_s] < proc->float_registers[rs2_flt_s]) {
             proc->float_registers[rd_flt_s] = 1;
         } else {
@@ -462,9 +463,9 @@ void run(processor_t *proc, const binary *program) {
         goto next_instr;
     fgt_s:
         ;
-        float rd_fgt_s = get_register(proc, &register_tree);
-        float rs1_fgt_s = get_register(proc, &register_tree);
-        float rs2_fgt_s = get_register(proc, &register_tree);
+        int rd_fgt_s = get_register(proc, &register_tree);
+        int rs1_fgt_s = get_register(proc, &register_tree);
+        int rs2_fgt_s = get_register(proc, &register_tree);
         if (proc->float_registers[rs1_fgt_s] > proc->float_registers[rs2_fgt_s]) {
             proc->float_registers[rd_fgt_s] = 1;
         } else {
