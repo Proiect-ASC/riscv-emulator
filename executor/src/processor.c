@@ -138,7 +138,7 @@ void run(processor_t *proc, const binary *program) {
     };
     proc->program_counter = program->program_start;
     uint16_t program_end = program->program_end;
-    proc->int_registers[19] = program_end + 1; //return addres (ra) to program end + 1 from the test examples, because no main is defined
+    proc->int_registers[19] = program_end + 1; //return address (ra) to program end + 1 from the test examples, because no main is defined
     memcpy(proc->ram, program->content, RAM_SIZE);
     uint8_t index = 0;
     next_instr:
@@ -165,7 +165,7 @@ void run(processor_t *proc, const binary *program) {
         goto next_instr;
     add:
         ;
-        int rd_add = get_register(proc, &register_tree);
+        int rd_add = get_register(pr-oc, &register_tree);
         int rs1_add = get_register(proc, &register_tree);
         int rs2_add = get_register(proc, &register_tree);
         proc->int_registers[rd_add] = proc->int_registers[rs1_add] + proc->int_registers[rs2_add];
@@ -256,13 +256,25 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     sd:
-        // TODO: implement
+        ;
+        int rd_sd = get_register(proc, &register_tree);
+        int dest_addr_sd = get_address(proc);
+        int dest_addr_reg_sd = get_register(proc, &register_tree);
+        int return_addr_sd = proc->program_counter;
+        proc->program_counter = dest_addr_sd + proc->int_registers[dest_addr_reg_sd];
+        put_int_immediate(proc, proc->int_registers[rd_sd], 64);
+        proc->program_counter = return_addr_sd;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     srai:
-        // TODO: implement
+        ;
+        int rs_srai = get_register(proc, &register_tree);
+        int rd_srai = get_register(proc, &register_tree);
+        int imm_srai = get_int_immediate(proc, 32);
+        int bit_mask = (1 << 31) & rs_srai;
+        proc->int_registers[rd_srai] = (proc->int_registers[rs_srai] >> imm_srai) | bit_mask;
         if (proc->program_counter > program_end) {
             goto end;
         }
