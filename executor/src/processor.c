@@ -234,12 +234,12 @@ void run(processor_t *proc, const binary *program) {
         goto next_instr;
     sb:
         ;
-        int rd_sb = get_register(proc, &register_tree);
+        int rs_sb = get_register(proc, &register_tree);
         int dest_addr_sb = get_address(proc);
         int dest_addr_reg_sb = get_register(proc, &register_tree);
         int return_addr_sb = proc->program_counter;
         proc->program_counter = dest_addr_sb + proc->int_registers[dest_addr_reg_sb];
-        put_int_immediate(proc, proc->int_registers[rd_sb], 8);
+        put_int_immediate(proc, proc->int_registers[rs_sb], 8);
         proc->program_counter = return_addr_sb;
         if (proc->program_counter > program_end) {
             goto end;
@@ -345,7 +345,14 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fsw:
-        // TODO: implement
+        ;
+        int rs_fsw = get_register(proc, &register_tree);
+        int dest_addr_fsw = get_address(proc);
+        int dest_addr_reg_fsw = get_register(proc, &register_tree);
+        int return_addr_fsw = proc->program_counter;
+        proc->program_counter = dest_addr_fsw + proc->float_registers[dest_addr_reg_fsw];
+        put_int_immediate(proc, proc->float_registers[rs_fsw], 32);
+        proc->program_counter = return_addr_fsw;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -370,13 +377,25 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     flw:
-        // TODO: implement
+        ;
+        float rd_flw = get_register(proc, &register_tree);
+        float dest_addr_flw = get_address(proc);
+        float dest_addr_reg_flw = get_register(proc, &register_tree);
+        float return_addr_flw = proc->program_counter;
+        proc->program_counter = dest_addr_flw + proc->float_registers[dest_addr_reg_flw];
+        float imm_flw = get_int_immediate(proc, 32);
+        proc->program_counter = return_addr_flw;
+        proc->float_registers[rd_flw] = imm_flw;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     fadd_s:
-        // TODO: implement
+        ;
+        float rd_fadd_s = get_register(proc, &register_tree);
+        float rs1_fadd_s = get_register(proc, &register_tree);
+        float rs2_fadd_s = get_register(proc, &register_tree);
+        proc->float_registers[rd_fadd_s] = proc->float_registers[rs1_fadd_s] + proc->float_registers[rs2_fadd_s];
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -388,7 +407,10 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fmv_s:
-        // TODO: implement
+        ;
+        float rd_fmv_s = get_register(proc, &register_tree);
+        float rs_fmv_s = get_register(proc, &register_tree);
+        proc->float_registers[rd_fmv_s] = proc->float_registers[rs_fmv_s];
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -400,13 +422,29 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     flt_s:
-        // TODO: implement
+        ;
+        float rd_flt_s = get_register(proc, &register_tree);
+        float rs1_flt_s = get_register(proc, &register_tree);
+        float rs2_flt_s = get_register(proc, &register_tree);
+        if (proc->float_registers[rs1_flt_s] < proc->float_registers[rs2_flt_s]) {
+            proc->float_registers[rd_flt_s] = 1;
+        } else {
+            proc->float_registers[rd_flt_s] = 0;
+        }
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     fgt_s:
-        // TODO: implement
+        ;
+        float rd_fgt_s = get_register(proc, &register_tree);
+        float rs1_fgt_s = get_register(proc, &register_tree);
+        float rs2_fgt_s = get_register(proc, &register_tree);
+        if (proc->float_registers[rs1_fgt_s] > proc->float_registers[rs2_fgt_s]) {
+            proc->float_registers[rd_fgt_s] = 1;
+        } else {
+            proc->float_registers[rd_fgt_s] = 0;
+        }
         if (proc->program_counter > program_end) {
             goto end;
         }
