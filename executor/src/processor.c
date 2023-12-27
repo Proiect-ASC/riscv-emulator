@@ -272,7 +272,7 @@ void run(processor_t *proc, const binary *program) {
         ;
         int rs_srai = get_register(proc, &register_tree);
         int rd_srai = get_register(proc, &register_tree);
-        int imm_srai = get_int_immediate(proc, 32);
+        int imm_srai = get_int_immediate(proc, 6);
         int bit_mask = (1 << 31) & rs_srai;
         proc->int_registers[rd_srai] = (proc->int_registers[rs_srai] >> imm_srai) | bit_mask;
         if (proc->program_counter > program_end) {
@@ -296,13 +296,25 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     slli:
-        // TODO: implement
+        ;
+        int rd_slli = get_register(proc, &register_tree);
+        int rs_slli = get_register(proc, &register_tree);
+        int imm_slli = get_int_immediate(proc, 6);
+        proc->int_registers[rd_slli] = proc->int_registers[rs_slli] << imm_slli;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     lw:
-        // TODO: implement
+        ;
+        int rd_lw = get_register(proc, &register_tree);
+        int dest_addr_lw = get_address(proc);
+        int dest_addr_reg_lw = get_register(proc, &register_tree);
+        int return_addr_lw = proc->program_counter;
+        proc->program_counter = dest_addr_lw + proc->int_registers[dest_addr_reg_lw];
+        int imm_lw = get_int_immediate(proc, 32);
+        proc->program_counter = return_addr_lw;
+        proc->int_registers[rd_lw] = imm_lw;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -339,13 +351,20 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     la:
-        // TODO: implement
+        ;
+        int rd_la = get_register(proc, &register_tree);
+        int source_load_address = get_adress(proc);
+        proc->int_registers[rd_la] = source_load_address;
         if (proc->program_counter > program_end) {
             goto end;
         }
         goto next_instr;
     bgt:
-        // TODO: implement
+        ;
+        int r1_bgt = get_register(proc, &register_tree);
+        int r2_bgt = get_register(proc, &register_tree);
+        int dest_addr_bgt = get_address(proc);
+        if (proc->int_registers[r1_bgt] > proc->int_registers[r2_bgt]) proc->program_counter = dest_addr_bgt;
         if (proc->program_counter > program_end) {
             goto end;
         }
