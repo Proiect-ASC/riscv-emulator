@@ -316,7 +316,15 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     ld:
-        // TODO: implement
+        ;
+        int rd_ld = get_register(proc, &register_tree);
+        int dest_addr_ld = get_address(proc);
+        int dest_addr_reg_ld = get_register(proc, &register_tree);
+        int return_addr_ld = proc->program_counter;
+        proc->program_counter = dest_addr_ld + proc->int_registers[dest_addr_reg_ld];
+        int imm_ld = get_int_immediate(proc, 32);
+        proc->program_counter = return_addr_ld;
+        proc->int_registers[rd_ld] = imm_ld;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -365,7 +373,15 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fld:
-        // TODO: implement
+        ;
+        int rd_fld = get_register(proc, &register_tree);
+        uint16_t dest_addr_fld = get_address(proc);
+        int dest_addr_reg_fld = get_register(proc, &register_tree);
+        int return_addr_fld = proc->program_counter;
+        proc->program_counter = dest_addr_fld + proc->int_registers[dest_addr_reg_fld];
+        float imm_fld = get_float_immediate(proc);
+        proc->program_counter = return_addr_fld;
+        proc->float_registers[rd_fld] = imm_fld;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -442,7 +458,10 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fmv_s_x:
-        // TODO: implement
+        ;
+        int rd_fmv_s_x = get_register(proc, &register_tree);
+        int rs_fmv_s_x = get_register(proc, &register_tree);
+        proc->int_registers[rd_fmv_s_x] = proc->float_registers[rs_fmv_s_x];
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -482,7 +501,11 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fadd_d:
-        // TODO: implement
+        ;
+        int rd_fadd_d = get_register(proc, &register_tree);
+        int rs1_fadd_d = get_register(proc, &register_tree);
+        int rs2_fadd_d = get_register(proc, &register_tree);
+        proc->float_registers[rd_fadd_d] = proc->float_registers[rs1_fadd_d] + proc->float_registers[rs2_fadd_d];
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -494,7 +517,11 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fsub_d:
-        // TODO: implement
+        ;
+        int rd_fsub_d = get_register(proc, &register_tree);
+        int rs1_fsub_d = get_register(proc, &register_tree);
+        int rs2_fsub_d = get_register(proc, &register_tree);
+        proc->float_registers[rd_fsub_d] = proc->float_registers[rs1_fsub_d] - proc->float_registers[rs2_fsub_d];
         if (proc->program_counter > program_end) {
             goto end;
         }
