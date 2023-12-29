@@ -310,7 +310,7 @@ void run(processor_t *proc, const binary *program) {
         int rd_sub = get_register(proc, &register_tree);
         int rs1_sub = get_register(proc, &register_tree);
         int rs2_sub = get_register(proc, &register_tree);
-        proc->int_registers[rd_sub] = proc->int_registers[rs2_sub] - proc->int_registers[rs1_sub];
+        proc->int_registers[rd_sub] = proc->int_registers[rs1_sub] - proc->int_registers[rs2_sub];
         if (proc->program_counter > program_end) {
             goto end;
         }
