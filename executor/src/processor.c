@@ -9,6 +9,7 @@ void save_state(const processor_t *proc, const char *state_file_handle) {
     fwrite(&proc->program_counter, 2, 1, state_file);
     fwrite(proc->int_registers, 4, 32, state_file);
     fwrite(proc->float_registers, 4, 32, state_file);
+    fclose(state_file);
 }
 
 void load_state(processor_t *proc, const char *state_file_handle) {
@@ -17,22 +18,22 @@ void load_state(processor_t *proc, const char *state_file_handle) {
     fread(&proc->program_counter, 2, 1, state_file);
     fread(proc->int_registers, 4, 32, state_file);
     fread(proc->float_registers, 4, 32, state_file);
+    fclose(state_file);
 }
 
-binary load_executable(const char *file_handle) {
+void assign_task(processor_t *proc, const char *file_handle) {
     FILE *binary_file = fopen(file_handle, "r");
-    binary program;
-    fread(&program.remainder, 1, 1, binary_file);
-    fread(&program.program_start, 2, 1, binary_file);
-    fread(&program.content, 1, RAM_SIZE, binary_file);
+    fread(&proc->assigned_task.remainder, 1, 1, binary_file);
+    fread(&proc->assigned_task.program_start, 2, 1, binary_file);
+    fread(&proc->assigned_task.content, 1, RAM_SIZE, binary_file);
     fseek(binary_file, 0, SEEK_END);
-    program.program_end = 8 * ftell(binary_file) - program.remainder - 24;
-    return program;
+    proc->assigned_task.program_end = 8 * ftell(binary_file) - proc->assigned_task.remainder - 24 - 1;
+    fclose(binary_file);
 }
 
 extern inline uint16_t get_address(processor_t *proc) {
     uint16_t addr = 0;
-    for (int i = 0; i < ADDRESS_LENGHT; ++i) {
+    for (int i = 0; i < ADDRESS_LENGTH; ++i) {
         uint16_t curr_byte = proc->program_counter / 8;
         if (proc->ram[curr_byte] & (1 << (7 - proc->program_counter++ % 8))) {
             addr += (1 << (7 - i % 8 + (i / 8) * 8));
@@ -57,6 +58,11 @@ extern inline uint8_t get_register(processor_t *proc, const huffman_tree *regist
 
 extern inline int get_int_immediate(processor_t *proc, uint8_t length) {
     int val = 0;
+    if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
+        int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
+        int byte_offset = proc->program_counter - addr_base;
+        proc->program_counter = addr_base + byte_offset * 8;
+    }
     for (int i = 0; i < length; ++i) {
         uint16_t curr_byte = proc->program_counter / 8;
         if (proc->ram[curr_byte] & (1 << (7 - proc->program_counter++ % 8))) {
@@ -67,6 +73,10 @@ extern inline int get_int_immediate(processor_t *proc, uint8_t length) {
 }
 
 extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length) {
+    if(proc->program_counter >= proc->assigned_task.program_start && proc->program_counter <= proc->assigned_task.program_end) {
+        fprintf(stderr, "[ERROR] Cannot put integer immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
+        exit(1);
+    }
     for (int i = 0; i < length; ++i) {
         uint16_t curr_byte = proc->program_counter / 8;
         proc->ram[curr_byte] &= ((uint8_t)0xFF ^ (1 << (7 - proc->program_counter % 8)));
@@ -90,6 +100,10 @@ extern inline float get_float_immediate(processor_t *proc) {
 }
 
 extern inline void put_float_immediate(processor_t *proc, float imm) {
+    if(proc->program_counter >= proc->assigned_task.program_start && proc->program_counter <= proc->assigned_task.program_end) {
+        fprintf(stderr, "[ERROR] Cannot put float immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
+        exit(1);
+    }
     intfloat val;
     val.f = imm;
     for (int i = 0; i < 32; ++i) {
@@ -102,7 +116,7 @@ extern inline void put_float_immediate(processor_t *proc, float imm) {
     }
 }
 
-void run(processor_t *proc, const binary *program) {
+void run(processor_t *proc) {
     /* to match instructions or registers to indices, look up the huffman tree and match, in order, each item with the
      * respective position in the array, n-th item to n-th array position, such as
      * a4 ... register_indices[4] = 4 (because a4 is the 5th int register to appear)
@@ -162,11 +176,11 @@ void run(processor_t *proc, const binary *program) {
             &&sd,
             &&srai
     };
-    proc->program_counter = program->program_start;
-    uint16_t program_end = program->program_end;
+    proc->program_counter = proc->assigned_task.program_start;
+    uint16_t program_end = proc->assigned_task.program_end;
     proc->int_registers[19] = program_end + 1; //return address (ra) to program end + 1 from the test examples, because no main is defined
     proc->int_registers[28] = RAM_SIZE - 1; //stack pointer is at bottom of the stack
-    memcpy(proc->ram, program->content, RAM_SIZE);
+    memcpy(proc->ram, proc->assigned_task.content, RAM_SIZE);
     uint8_t index = 0;
     next_instr:
         while (instruction_tree.nodes[index].value == -1) {
