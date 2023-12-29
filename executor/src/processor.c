@@ -1,5 +1,6 @@
 #include "processor.h"
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
 
 void save_state(const processor_t *proc, const char *state_file_handle) {
@@ -443,7 +444,11 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fmul_s:
-        // TODO: implement
+        ;
+        int rd_fmul_s = get_register(proc, &register_tree);
+        int rs1_fmul_s = get_register(proc, &register_tree);
+        int rs2_fmul_s = get_register(proc, &register_tree);
+        proc->float_registers[rd_fmul_s] = proc->float_registers[rs1_fmul_s] * proc->float_registers[rs2_fmul_s];
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -495,7 +500,10 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fsqrt_d:
-        // TODO: implement
+        ;
+        int rd_fsqrt_d = get_register(proc, &register_tree);
+        int rs1_fsqrt_d = get_register(proc, &register_tree);
+        proc->float_registers[rd_fsqrt_d] = sqrt(proc->float_registers[rs1_fsqrt_d]);
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -511,7 +519,11 @@ void run(processor_t *proc, const binary *program) {
         }
         goto next_instr;
     fmul_d:
-        // TODO: implement
+        ;
+        int rd_fmul_d = get_register(proc, &register_tree);
+        int rs1_fmul_d = get_register(proc, &register_tree);
+        int rs2_fmul_d = get_register(proc, &register_tree);
+        proc->float_registers[rd_fmul_d] = proc->float_registers[rs1_fmul_d] * proc->float_registers[rs2_fmul_d];
         if (proc->program_counter > program_end) {
             goto end;
         }
