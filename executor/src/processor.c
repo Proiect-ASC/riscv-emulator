@@ -165,6 +165,7 @@ void run(processor_t *proc, const binary *program) {
     proc->program_counter = program->program_start;
     uint16_t program_end = program->program_end;
     proc->int_registers[19] = program_end + 1; //return address (ra) to program end + 1 from the test examples, because no main is defined
+    proc->int_registers[28] = RAM_SIZE - 1; //stack pointer is at bottom of the stack
     memcpy(proc->ram, program->content, RAM_SIZE);
     uint8_t index = 0;
     next_instr:
@@ -466,7 +467,9 @@ void run(processor_t *proc, const binary *program) {
         ;
         int rd_fmv_s_x = get_register(proc, &register_tree);
         int rs_fmv_s_x = get_register(proc, &register_tree);
-        proc->int_registers[rd_fmv_s_x] = proc->float_registers[rs_fmv_s_x];
+        intfloat temp_fmv_s_x;
+        temp_fmv_s_x.f = proc->float_registers[rs_fmv_s_x];
+        proc->int_registers[rd_fmv_s_x] = temp_fmv_s_x.i;
         if (proc->program_counter > program_end) {
             goto end;
         }
