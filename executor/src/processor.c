@@ -58,6 +58,10 @@ extern inline uint8_t get_register(processor_t *proc, const huffman_tree *regist
 
 extern inline int get_int_immediate(processor_t *proc, uint8_t length) {
     int val = 0;
+    if(proc->program_counter >= proc->assigned_task.program_end && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
+        fprintf(stderr, "[ERROR] Cannot get integer immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
+        exit(1);
+    }
     if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
         int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
         int byte_offset = proc->program_counter - addr_base;
@@ -73,9 +77,14 @@ extern inline int get_int_immediate(processor_t *proc, uint8_t length) {
 }
 
 extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length) {
-    if(proc->program_counter >= proc->assigned_task.program_start && proc->program_counter <= proc->assigned_task.program_end) {
+    if(proc->program_counter >= proc->assigned_task.program_start && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
         fprintf(stderr, "[ERROR] Cannot put integer immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
         exit(1);
+    }
+    if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
+        int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
+        int byte_offset = proc->program_counter - addr_base;
+        proc->program_counter = addr_base + byte_offset * 8;
     }
     for (int i = 0; i < length; ++i) {
         uint16_t curr_byte = proc->program_counter / 8;
@@ -88,6 +97,15 @@ extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length)
 }
 
 extern inline float get_float_immediate(processor_t *proc) {
+    if(proc->program_counter >= proc->assigned_task.program_end && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
+        fprintf(stderr, "[ERROR] Cannot get float immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
+        exit(1);
+    }
+    if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
+        int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
+        int byte_offset = proc->program_counter - addr_base;
+        proc->program_counter = addr_base + byte_offset * 8;
+    }
     intfloat val;
     val.i = 0;
     for (int i = 0; i < 32; ++i) {
@@ -100,9 +118,14 @@ extern inline float get_float_immediate(processor_t *proc) {
 }
 
 extern inline void put_float_immediate(processor_t *proc, float imm) {
-    if(proc->program_counter >= proc->assigned_task.program_start && proc->program_counter <= proc->assigned_task.program_end) {
+    if(proc->program_counter >= proc->assigned_task.program_start && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
         fprintf(stderr, "[ERROR] Cannot put float immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
         exit(1);
+    }
+    if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
+        int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
+        int byte_offset = proc->program_counter - addr_base;
+        proc->program_counter = addr_base + byte_offset * 8;
     }
     intfloat val;
     val.f = imm;
