@@ -31,7 +31,7 @@ void assign_task(processor_t *proc, const char *file_handle) {
     fclose(binary_file);
 }
 
-extern inline uint16_t get_address(processor_t *proc) {
+static inline uint16_t get_address(processor_t *proc) {
     uint16_t addr = 0;
     for (int i = 0; i < ADDRESS_LENGTH; ++i) {
         uint16_t curr_byte = proc->program_counter / 8;
@@ -42,7 +42,7 @@ extern inline uint16_t get_address(processor_t *proc) {
     return addr;
 }
 
-extern inline uint8_t get_register(processor_t *proc, const huffman_tree *register_tree) {
+static inline uint8_t get_register(processor_t *proc, const huffman_tree *register_tree) {
     uint8_t index = 0;
     while (register_tree->nodes[index].value == -1) {
         uint16_t curr_byte = proc->program_counter / 8;
@@ -56,17 +56,21 @@ extern inline uint8_t get_register(processor_t *proc, const huffman_tree *regist
     return register_tree->nodes[index].value;
 }
 
-extern inline int get_int_immediate(processor_t *proc, uint8_t length) {
-    int val = 0;
-    if(proc->program_counter >= proc->assigned_task.program_end && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
-        fprintf(stderr, "[ERROR] Cannot get integer immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
-        exit(1);
-    }
+static inline void compute_heap_addr(processor_t *proc) {
     if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
         int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
         int byte_offset = proc->program_counter - addr_base;
         proc->program_counter = addr_base + byte_offset * 8;
     }
+}
+
+static inline int get_int_immediate(processor_t *proc, uint8_t length) {
+    int val = 0;
+    if(proc->program_counter >= proc->assigned_task.program_end && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
+        fprintf(stderr, "[ERROR] Cannot get integer immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
+        exit(1);
+    }
+    compute_heap_addr(proc);
     for (int i = 0; i < length; ++i) {
         uint16_t curr_byte = proc->program_counter / 8;
         if (proc->ram[curr_byte] & (1 << (7 - proc->program_counter++ % 8))) {
@@ -76,16 +80,12 @@ extern inline int get_int_immediate(processor_t *proc, uint8_t length) {
     return val;
 }
 
-extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length) {
+static inline void put_int_immediate(processor_t *proc, int imm, uint8_t length) {
     if(proc->program_counter >= proc->assigned_task.program_start && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
         fprintf(stderr, "[ERROR] Cannot put integer immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
         exit(1);
     }
-    if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
-        int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
-        int byte_offset = proc->program_counter - addr_base;
-        proc->program_counter = addr_base + byte_offset * 8;
-    }
+    compute_heap_addr(proc);
     for (int i = 0; i < length; ++i) {
         uint16_t curr_byte = proc->program_counter / 8;
         proc->ram[curr_byte] &= ((uint8_t)0xFF ^ (1 << (7 - proc->program_counter % 8)));
@@ -96,16 +96,12 @@ extern inline void put_int_immediate(processor_t *proc, int imm, uint8_t length)
     }
 }
 
-extern inline float get_float_immediate(processor_t *proc) {
+static inline float get_float_immediate(processor_t *proc) {
     if(proc->program_counter >= proc->assigned_task.program_end && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
         fprintf(stderr, "[ERROR] Cannot get float immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
         exit(1);
     }
-    if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
-        int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
-        int byte_offset = proc->program_counter - addr_base;
-        proc->program_counter = addr_base + byte_offset * 8;
-    }
+    compute_heap_addr(proc);
     intfloat val;
     val.i = 0;
     for (int i = 0; i < 32; ++i) {
@@ -117,16 +113,12 @@ extern inline float get_float_immediate(processor_t *proc) {
     return val.f;
 }
 
-extern inline void put_float_immediate(processor_t *proc, float imm) {
+static inline void put_float_immediate(processor_t *proc, float imm) {
     if(proc->program_counter >= proc->assigned_task.program_start && proc->program_counter <= proc->assigned_task.program_end + proc->assigned_task.remainder) {
         fprintf(stderr, "[ERROR] Cannot put float immediate. Access violation at address 0x%X, terminating program...\n", proc->program_counter);
         exit(1);
     }
-    if(proc->program_counter > (proc->assigned_task.program_end + proc->assigned_task.remainder)) {
-        int addr_base = proc->assigned_task.program_end + proc->assigned_task.remainder + 1;
-        int byte_offset = proc->program_counter - addr_base;
-        proc->program_counter = addr_base + byte_offset * 8;
-    }
+    compute_heap_addr(proc);
     intfloat val;
     val.f = imm;
     for (int i = 0; i < 32; ++i) {
@@ -203,7 +195,7 @@ void run(processor_t *proc) {
     uint16_t program_end = proc->assigned_task.program_end;
     proc->int_registers[18] = 0; // zero is zero B)
     proc->int_registers[19] = program_end + 1; // return address (ra) to program end + 1 from the test examples, because no main is defined
-    proc->int_registers[28] = RAM_SIZE + 7 * (proc->assigned_task.program_end + proc->assigned_task.remainder + 1) / 8 - 1 ; //stack pointer is at bottom of the stack
+    proc->int_registers[28] = RAM_SIZE + 7 * (proc->assigned_task.program_end + proc->assigned_task.remainder + 1) / 8 - 1 ; // stack pointer is at bottom of the stack
     memcpy(proc->ram, proc->assigned_task.content, RAM_SIZE);
     uint8_t index = 0;
     next_instr:
@@ -335,12 +327,14 @@ void run(processor_t *proc) {
         goto next_instr;
     srai:
         ;
-        int rs_srai = get_register(proc, &register_tree);
         int rd_srai = get_register(proc, &register_tree);
+        int rs_srai = get_register(proc, &register_tree);
         int imm_srai = get_int_immediate(proc, 32);
         signedunsigned bitmask;
         bitmask.u = ~(~0U >> imm_srai);
-        proc->int_registers[rd_srai] = (proc->int_registers[rs_srai] >> imm_srai) | bitmask.s;
+        bool is_rs_negative_srai = proc->int_registers[rs_srai] < 0;
+        proc->int_registers[rd_srai] = (proc->int_registers[rs_srai] >> imm_srai);
+        if (is_rs_negative_srai) proc->int_registers[rd_srai] |= bitmask.s;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -592,7 +586,12 @@ void run(processor_t *proc) {
         }
         goto next_instr;
     call_strlen:
-        // TODO: implement
+        ;
+        int return_addr_call_strlen = proc->program_counter;
+        proc->program_counter = proc->int_registers[22];
+        compute_heap_addr(proc);
+        proc->int_registers[22] = strlen(&proc->ram[proc->program_counter / 8]);
+        proc->program_counter = return_addr_call_strlen;
         if (proc->program_counter > program_end) {
             goto end;
         }
