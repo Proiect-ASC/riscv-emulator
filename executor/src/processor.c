@@ -201,7 +201,8 @@ void run(processor_t *proc) {
     };
     proc->program_counter = proc->assigned_task.program_start;
     uint16_t program_end = proc->assigned_task.program_end;
-    proc->int_registers[19] = program_end + 1; //return address (ra) to program end + 1 from the test examples, because no main is defined
+    proc->int_registers[18] = 0; // zero is zero B)
+    proc->int_registers[19] = program_end + 1; // return address (ra) to program end + 1 from the test examples, because no main is defined
     proc->int_registers[28] = RAM_SIZE + 7 * (proc->assigned_task.program_end + proc->assigned_task.remainder + 1) / 8 - 1 ; //stack pointer is at bottom of the stack
     memcpy(proc->ram, proc->assigned_task.content, RAM_SIZE);
     uint8_t index = 0;
