@@ -21,7 +21,7 @@ huffman_node new_huffman_node(int value, const char *code, int8_t l, int8_t r)
 
 // Returns last node_index
 
-uint8_t dfs(FILE *f, huffman_node *root, char* code, int code_length, uint8_t node_index, bool instr_or_registers, int *target)
+uint8_t dfs(FILE *f, huffman_node *root, char* code, int code_length, uint8_t node_index, int* indices, int *index)
 {
 	char line[32];
 	if(fgets(line, 32, f) == NULL)
@@ -35,20 +35,20 @@ uint8_t dfs(FILE *f, huffman_node *root, char* code, int code_length, uint8_t no
 	
 	if(strlen(line) > 2)
 	{
-        *node = new_huffman_node(instr_or_registers ? ((*target)++) % 32 : (*target)++, code, -1, -1);
+        *node = new_huffman_node(indices[(*index)++], code, -1, -1);
 		return node_index;
 	}
 
 	// node is not a leaf
 	
-	uint8_t left_last_index = dfs(f, root, code, code_length, node_index + 1, instr_or_registers, target);
-	uint8_t right_last_index = dfs(f, root, code, code_length, left_last_index + 1, instr_or_registers, target);
+	uint8_t left_last_index = dfs(f, root, code, code_length, node_index + 1, indices, index);
+	uint8_t right_last_index = dfs(f, root, code, code_length, left_last_index + 1, indices, index);
 	*node = new_huffman_node(-1, NULL, node_index + 1, left_last_index + 1);
 
 	return right_last_index;
 }
 
-huffman_tree load_huffman_tree(const char* file_name, bool instrs_or_regs)
+huffman_tree load_huffman_tree(const char* file_name, int* indices)
 {
 	FILE *f = fopen(file_name, "r");
 	huffman_tree tree;
@@ -56,8 +56,8 @@ huffman_tree load_huffman_tree(const char* file_name, bool instrs_or_regs)
 
 	fscanf(f, "%hhd", &tree.size);
 	tree.nodes = (huffman_node *) malloc(tree.size * sizeof(huffman_node));
-    int target = 0;
-	dfs(f, tree.nodes, code_buffer, 0, 0, instrs_or_regs, &target);
+    int index = 0;
+	dfs(f, tree.nodes, code_buffer, 0, 0, indices, &index);
 
 	fclose(f);
 	return tree;
