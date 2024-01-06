@@ -4,9 +4,9 @@ slli 01000
 lw 01001
 ble 0101000
 bnez 0101001
-call cfunc 0101010
-call scanf 01010110
-call strlen 01010111
+callcfunc 0101010
+callscanf 01010110
+callstrlen 01010111
 fadd.d 0101100
 fmul.d 0101101
 fgt.s 0101110
@@ -15,7 +15,7 @@ mv 0110
 ret 0111
 li 1000
 add 1001
-call intern 1010
+callintern 1010
 flw 1011000
 fadd.s 1011001
 fmv.s.x 1011010
@@ -31,7 +31,7 @@ fsw 111001
 fmul.s 111010
 fmv.s 111011
 fsub.d 1111000
-call printf 1111001
+callprintf 1111001
 la 1111010
 bgt 1111011
 sd 111110

@@ -139,6 +139,7 @@ typedef enum token_type
 	CALLSCANF,
 	CALLCFUNC,
 	CALLSTRLEN,
+	CALLINTERN,
 	COUNT_TOKEN_TYPE
 } token_type;
 

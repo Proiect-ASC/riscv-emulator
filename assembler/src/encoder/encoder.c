@@ -139,36 +139,33 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 				if(i > 0 && strcmp(tarr->array[i - 1].text, ".global") == 0) break;
 				if(strcmp(text, "printf") == 0 && tarr->array[i - 1].type == CALL)
 				{
-					pc -= strlen(encoded_arr[i - 1]);
 					free(encoded_arr[i - 1]);
 					wtea(&encoded_arr[i - 1], code_table[CALLPRINTF]);
-					pc += strlen(encoded_arr[i - 1]);
 				}
 				else if(strcmp(text, "cfunc") == 0 && tarr->array[i - 1].type == CALL)
 				{
-					pc -= strlen(encoded_arr[i - 1]);
 					free(encoded_arr[i - 1]);
-					wtea(&encoded_arr[i - 1], code_table[CALLSCANF]);
-					pc += strlen(encoded_arr[i - 1]);
+					wtea(&encoded_arr[i - 1], code_table[CALLCFUNC]);
 				}
 				else if(strcmp(text, "strlen") == 0 && tarr->array[i - 1].type == CALL)
 				{
-					pc -= strlen(encoded_arr[i - 1]);
 					free(encoded_arr[i - 1]);
-					wtea(&encoded_arr[i - 1], code_table[CALLCFUNC]);
-					pc += strlen(encoded_arr[i - 1]);
+					wtea(&encoded_arr[i - 1], code_table[CALLSTRLEN]);
 				}
 				else if(strcmp(text, "scanf") == 0 && tarr->array[i - 1].type == CALL)
 				{
-					pc -= strlen(encoded_arr[i - 1]);
 					free(encoded_arr[i - 1]);
-					wtea(&encoded_arr[i - 1], code_table[CALLSTRLEN]);
-					pc += strlen(encoded_arr[i - 1]);
+					wtea(&encoded_arr[i - 1], code_table[CALLSCANF]);
 				}
 				else if(hm_get(&label_hm, text, &num_val) == -1)
 				{
-					fprintf(stderr, "[ERROR] symbol %s could not be linked\n", text);
+					fprintf(stderr, "[ERROR] symbol %s not found\n", text);
 					exit(1);
+				}
+				else if(tarr->array[i - 1].type == CALL)
+				{
+					free(encoded_arr[i - 1]);
+					wtea(&encoded_arr[i - 1], code_table[CALLINTERN]);
 				}
 				else
 				{

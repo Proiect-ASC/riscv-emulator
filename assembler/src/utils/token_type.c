@@ -109,7 +109,8 @@ void init_kw_hashmap()
 		{ "callprintf", CALLPRINTF },
 		{ "callscanf", CALLSCANF },
 		{ "callcfunc", CALLCFUNC },
-		{ "callstrlen", CALLSTRLEN }
+		{ "callstrlen", CALLSTRLEN },
+		{ "callintern", CALLINTERN }
 	};
 	token_hashmap = init_hashmap(pairs, sizeof(pairs) / sizeof(kvpair_t)); 
 }
