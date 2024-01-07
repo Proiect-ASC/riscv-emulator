@@ -219,7 +219,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 				{
 					text[n - 1] = '\0';
 					num_val = atoi(text);
-					frellabel[num_val].array = realloc(frellabel[num_val].array, ++frellabel[num_val].size * 2);
+					frellabel[num_val].array = realloc(frellabel[num_val].array, ++frellabel[num_val].size);
 					frellabel[num_val].array[frellabel[num_val].size - 1] = i;
 				}
 				pc += (8 * sizeof(pc));
