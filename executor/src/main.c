@@ -60,9 +60,45 @@ void ex_3(processor_t *proc0) {
     printf("took %f to run, %f to setup, total %f (all times in seconds)", time_spent_clean, time_spent_dirty - time_spent_clean, time_spent_dirty);
 }
 
+void ex_4(processor_t *proc0) {
+    char *str = "ana are mere";
+    clock_t begin_dirty = clock();
+    proc0->int_registers[22] = 648;
+    assign_task(proc0, "../example_binaries/4.txt");
+    memcpy(proc0->assigned_task.content + 81, str, strlen(str) + 1);
+    save_state(proc0, "../state_files/4.in");
+    clock_t begin_clean = clock();
+    run(proc0);
+    clock_t end_clean = clock();
+    double time_spent_clean = (double)(end_clean - begin_clean) / CLOCKS_PER_SEC;
+    save_state(proc0, "../state_files/4.out");
+    clock_t end_dirty = clock();
+    double time_spent_dirty = (double)(end_dirty - begin_dirty) / CLOCKS_PER_SEC;
+    printf("read file, program ends after %hu bits, answer: %s\n", proc0->assigned_task.program_end + 1, &proc0->ram[81]);
+    printf("took %f to run, %f to setup, total %f (all times in seconds)", time_spent_clean, time_spent_dirty - time_spent_clean, time_spent_dirty);
+}
+
+void ex_5(processor_t *proc0) {
+    int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    clock_t begin_dirty = clock();
+    proc0->int_registers[22] = 296;
+    proc0->int_registers[23] = 11;
+    assign_task(proc0, "../example_binaries/5.txt");
+    memcpy(proc0->assigned_task.content + 37, a, 44);
+    save_state(proc0, "../state_files/5.in");
+    clock_t begin_clean = clock();
+    run(proc0);
+    clock_t end_clean = clock();
+    double time_spent_clean = (double)(end_clean - begin_clean) / CLOCKS_PER_SEC;
+    save_state(proc0, "../state_files/5.out");
+    clock_t end_dirty = clock();
+    double time_spent_dirty = (double)(end_dirty - begin_dirty) / CLOCKS_PER_SEC;
+    printf("read file, program ends after %hu bits, answer: %d\n", proc0->assigned_task.program_end + 1, proc0->int_registers[22]);
+    printf("took %f to run, %f to setup, total %f (all times in seconds)", time_spent_clean, time_spent_dirty - time_spent_clean, time_spent_dirty);
+}
+
 int main() {
     processor_t proc0;
     ex_3(&proc0);
-
     return 0;
 }
