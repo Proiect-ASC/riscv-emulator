@@ -318,7 +318,7 @@ void run(processor_t *proc) {
         int dest_addr_sd = get_address(proc);
         int dest_addr_reg_sd = get_register(proc, &register_tree);
         int return_addr_sd = proc->program_counter;
-        proc->program_counter = dest_addr_sd + proc->int_registers[dest_addr_reg_sd];
+        proc->program_counter = dest_addr_sd + proc->int_registers[dest_addr_reg_sd] + 4;
         put_int_immediate(proc, proc->int_registers[rd_sd], 32);
         proc->program_counter = return_addr_sd;
         if (proc->program_counter > program_end) {
@@ -355,7 +355,7 @@ void run(processor_t *proc) {
         int dest_addr_ld = get_address(proc);
         int dest_addr_reg_ld = get_register(proc, &register_tree);
         int return_addr_ld = proc->program_counter;
-        proc->program_counter = dest_addr_ld + proc->int_registers[dest_addr_reg_ld];
+        proc->program_counter = dest_addr_ld + proc->int_registers[dest_addr_reg_ld] + 4;
         int imm_ld = get_int_immediate(proc, 32);
         proc->program_counter = return_addr_ld;
         proc->int_registers[rd_ld] = imm_ld;
@@ -412,7 +412,7 @@ void run(processor_t *proc) {
         uint16_t dest_addr_fld = get_address(proc);
         int dest_addr_reg_fld = get_register(proc, &register_tree);
         int return_addr_fld = proc->program_counter;
-        proc->program_counter = dest_addr_fld + proc->int_registers[dest_addr_reg_fld];
+        proc->program_counter = dest_addr_fld + proc->int_registers[dest_addr_reg_fld] + 4;
         float imm_fld = get_float_immediate(proc);
         proc->program_counter = return_addr_fld;
         proc->float_registers[rd_fld] = imm_fld;
