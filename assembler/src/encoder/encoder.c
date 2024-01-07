@@ -141,21 +141,25 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 				{
 					free(encoded_arr[i - 1]);
 					wtea(&encoded_arr[i - 1], code_table[CALLPRINTF]);
+					pc += strlen(code_table[CALLPRINTF]);
 				}
 				else if(strcmp(text, "cfunc") == 0 && tarr->array[i - 1].type == CALL)
 				{
 					free(encoded_arr[i - 1]);
 					wtea(&encoded_arr[i - 1], code_table[CALLCFUNC]);
+					pc += strlen(code_table[CALLCFUNC]);
 				}
 				else if(strcmp(text, "strlen") == 0 && tarr->array[i - 1].type == CALL)
 				{
 					free(encoded_arr[i - 1]);
 					wtea(&encoded_arr[i - 1], code_table[CALLSTRLEN]);
+					pc += strlen(code_table[CALLSTRLEN]);
 				}
 				else if(strcmp(text, "scanf") == 0 && tarr->array[i - 1].type == CALL)
 				{
 					free(encoded_arr[i - 1]);
 					wtea(&encoded_arr[i - 1], code_table[CALLSCANF]);
+					pc += strlen(code_table[CALLSCANF]);
 				}
 				else if(hm_get(&label_hm, text, &num_val) == -1)
 				{
@@ -166,6 +170,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 				{
 					free(encoded_arr[i - 1]);
 					wtea(&encoded_arr[i - 1], code_table[CALLINTERN]);
+					pc += strlen(code_table[CALLINTERN]);
 				}
 				else
 				{

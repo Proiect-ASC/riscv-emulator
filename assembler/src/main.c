@@ -6,7 +6,7 @@
 #include "encoder.h"
 #include "utils.h"
 #define PROG_ARGC 3
-#define CODE_TABLE_PATH "../code_table.txt"
+#define CODE_TABLE_PATH "./code_table.txt"
 
 // For debug only
 
