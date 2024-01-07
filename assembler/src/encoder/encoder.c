@@ -194,6 +194,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 					exit(1);
 				}
 				brellabel[num_val] = pc;
+				if(frellabel[num_val].size == 0) break;
 				for(size_t i = 0; i < frellabel[num_val].size; i++)
 				{
 					encoded_arr[frellabel[num_val].array[i]] = buffer_to_code(&pc, sizeof(pc));
