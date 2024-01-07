@@ -427,7 +427,7 @@ void run(processor_t *proc) {
         ;
         int rs_fsw = get_register(proc, &register_tree);
         int dest_addr_fsw = get_address(proc);
-        uint16_t dest_addr_reg_fsw = get_register(proc, &register_tree);
+        int dest_addr_reg_fsw = get_register(proc, &register_tree);
         int return_addr_fsw = proc->program_counter;
         proc->program_counter = dest_addr_fsw + proc->int_registers[dest_addr_reg_fsw];
         put_float_immediate(proc, proc->float_registers[rs_fsw]);
@@ -515,9 +515,9 @@ void run(processor_t *proc) {
         int rs1_flt_s = get_register(proc, &register_tree);
         int rs2_flt_s = get_register(proc, &register_tree);
         if (proc->float_registers[rs1_flt_s] < proc->float_registers[rs2_flt_s]) {
-            proc->float_registers[rd_flt_s] = 1;
+            proc->int_registers[rd_flt_s] = 1;
         } else {
-            proc->float_registers[rd_flt_s] = 0;
+            proc->int_registers[rd_flt_s] = 0;
         }
         if (proc->program_counter > program_end) {
             goto end;
@@ -529,9 +529,9 @@ void run(processor_t *proc) {
         int rs1_fgt_s = get_register(proc, &register_tree);
         int rs2_fgt_s = get_register(proc, &register_tree);
         if (proc->float_registers[rs1_fgt_s] > proc->float_registers[rs2_fgt_s]) {
-            proc->float_registers[rd_fgt_s] = 1;
+            proc->int_registers[rd_fgt_s] = 1;
         } else {
-            proc->float_registers[rd_fgt_s] = 0;
+            proc->int_registers[rd_fgt_s] = 0;
         }
         if (proc->program_counter > program_end) {
             goto end;
