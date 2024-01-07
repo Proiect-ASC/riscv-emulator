@@ -314,6 +314,7 @@ void run(processor_t *proc) {
         goto next_instr;
     sd:
         ;
+        // instruction operating with long, but being limited to 32 bits we only look at the lower 32 bits
         int rd_sd = get_register(proc, &register_tree);
         int dest_addr_sd = get_address(proc);
         int dest_addr_reg_sd = get_register(proc, &register_tree);
@@ -351,6 +352,7 @@ void run(processor_t *proc) {
         goto next_instr;
     ld:
         ;
+        // instruction operating on long, but being limited to 32 bits we only look at the lower 32 bits
         int rd_ld = get_register(proc, &register_tree);
         int dest_addr_ld = get_address(proc);
         int dest_addr_reg_ld = get_register(proc, &register_tree);
@@ -408,6 +410,7 @@ void run(processor_t *proc) {
         goto next_instr;
     fld:
         ;
+        // instruction operating on double, but being limited to 32 bits we only look at the lower 32 bits
         int rd_fld = get_register(proc, &register_tree);
         uint16_t dest_addr_fld = get_address(proc);
         int dest_addr_reg_fld = get_register(proc, &register_tree);
