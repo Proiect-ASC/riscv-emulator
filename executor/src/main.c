@@ -143,12 +143,12 @@ void ex_7(processor_t *proc0) {
 }
 
 void ex_8(processor_t *proc0) {
+    clock_t begin_dirty = clock();;
     proc0->float_registers[28] = -100;
     proc0->float_registers[25] = 1000;
     proc0->float_registers[26] = 1;
     proc0->int_registers[22] = 392;
     proc0->int_registers[23] = 396;
-    clock_t begin_dirty = clock();;
     assign_task(proc0, "../example_binaries/8.txt");
     save_state(proc0, "../state_files/8.in");
     clock_t begin_clean = clock();
@@ -168,11 +168,11 @@ void ex_9(processor_t *proc0) {
         uint8_t padding[6]; // to match example
         uint8_t next[8]; // next is a long but due to no 64 bit we treat it as a padded int
     } element, list;
+    clock_t begin_dirty = clock();;
     proc0->int_registers[22] = 48;
     proc0->int_registers[23] = 64;
     memcpy(proc0->assigned_task.content + 6, &list, 16);
     memcpy(proc0->assigned_task.content + 22, &element, 16);
-    clock_t begin_dirty = clock();;
     assign_task(proc0, "../example_binaries/9.txt");
     save_state(proc0, "../state_files/9.in");
     clock_t begin_clean = clock();
