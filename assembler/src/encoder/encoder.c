@@ -171,6 +171,8 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 					free(encoded_arr[i - 1]);
 					wtea(&encoded_arr[i - 1], code_table[CALLINTERN]);
 					pc += strlen(code_table[CALLINTERN]);
+					encoded_arr[i] = buffer_to_code(&num_val, sizeof(pc));
+					pc += (8 * sizeof(pc));
 				}
 				else
 				{
@@ -186,23 +188,19 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 			case RELLABEL:
 				text[n - 1] = '\0';
 				num_val = atoi(text);
-				if(num_val < 1 || num_val > 99) 
+				if(num_val < 1 || num_val > 100) 
 				{
 					fprintf(stderr, "[ERROR] local should represent a value betweeen 1 and 100, got %d\n", num_val);
 					exit(1);
 				}
 				brellabel[num_val] = pc;
-				for(size_t i = 1; i < 101; i++)
+				for(size_t i = 0; i < frellabel[num_val].size; i++)
 				{
-					if(!frellabel[i].size) continue;
-					for(size_t j = 0; j < frellabel[i].size; j++)
-					{
-						encoded_arr[frellabel[i].array[j]] = buffer_to_code(&pc, sizeof(pc));
-					}
-					free(frellabel[i].array);
-					frellabel[i].array = NULL;
-					frellabel[i].size = 0;
+					encoded_arr[frellabel[num_val].array[i]] = buffer_to_code(&pc, sizeof(pc));
 				}
+				free(frellabel[num_val].array);
+				frellabel[num_val].array = NULL;
+				frellabel[num_val].size = 0;
 				break;
 			case RELLBJMP:
 				if(text[n - 1] == 'b')

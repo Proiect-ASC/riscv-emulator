@@ -1,7 +1,7 @@
 #ifndef HASHMAP_H
 #define HASHMAP_H
 #include <stdint.h>
-#define HM_CAPACITY 65536
+#define HM_CAPACITY 65521
 
 typedef struct kvpair_t
 {
