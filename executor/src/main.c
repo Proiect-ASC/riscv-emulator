@@ -221,6 +221,34 @@ void ex_11(processor_t *proc0) {
         printf("took %f to run, %f to setup, total %f (all times in seconds)", time_spent_clean, time_spent_dirty - time_spent_clean, time_spent_dirty);
 }
 
+void ex_12(processor_t *proc0) {
+    float a[] = {1, 1, 1, 1, 1, 1, 0, 1, 0};
+    float dst[] = {0, 0, 0};
+    float vector[] = {1, 2, 3};
+    clock_t begin_dirty = clock();
+    proc0->int_registers[22] = 640;
+    proc0->int_registers[23] = 652;
+    proc0->int_registers[24] = 688;
+    assign_task(proc0, "../example_binaries/C.txt");
+    memcpy(proc0->assigned_task.content + 80, dst, 12);
+    memcpy(proc0->assigned_task.content + 92, a, 36);
+    memcpy(proc0->assigned_task.content + 128, vector, 12);
+    save_state(proc0, "../state_files/C.in");
+    clock_t begin_clean = clock();
+    run(proc0);
+    clock_t end_clean = clock();
+    double time_spent_clean = (double)(end_clean - begin_clean) / CLOCKS_PER_SEC;
+    save_state(proc0, "../state_files/C.out");
+    clock_t end_dirty = clock();
+    double time_spent_dirty = (double)(end_dirty - begin_dirty) / CLOCKS_PER_SEC;
+    printf("read file, program ends after %hu bits, answer: ", proc0->assigned_task.program_end + 1);
+    for (int i = 0; i < 3; ++i) {
+        printf("%f ", *(float*)(&proc0->ram[80] + i * 4));
+    }
+    printf("\ntook %f to run, %f to setup, total %f (all times in seconds)", time_spent_clean, time_spent_dirty - time_spent_clean, time_spent_dirty);
+}
+
+
 int main() {
     processor_t proc0;
 //    ex_1(&proc0);
@@ -234,5 +262,6 @@ int main() {
 //    ex_9(&proc0);
 //    ex_10(&proc0);
 //    ex_11(&proc0);
+    ex_12(&proc0);
     return 0;
 }

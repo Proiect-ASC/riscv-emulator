@@ -503,8 +503,8 @@ void run(processor_t *proc) {
         int rd_fmv_s_x = get_register(proc, &register_tree);
         int rs_fmv_s_x = get_register(proc, &register_tree);
         intfloat temp_fmv_s_x;
-        temp_fmv_s_x.f = proc->float_registers[rs_fmv_s_x];
-        proc->int_registers[rd_fmv_s_x] = temp_fmv_s_x.i;
+        temp_fmv_s_x.i = proc->int_registers[rs_fmv_s_x];
+        proc->float_registers[rd_fmv_s_x] = temp_fmv_s_x.f;
         if (proc->program_counter > program_end) {
             goto end;
         }
