@@ -35,6 +35,11 @@ typedef union signedunsigned {
     uint32_t u;
 } signedunsigned;
 
+typedef union printf_arg {
+    char *s;
+    int d;
+} printf_arg;
+
 void save_state(const processor_t *proc, const char *state_file_handle);
 void load_state(processor_t *proc, const char *state_file_handle);
 void assign_task(processor_t *proc, const char *file_handle);
