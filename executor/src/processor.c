@@ -577,34 +577,44 @@ void run(processor_t *proc) {
         }
         goto next_instr;
     call_printf:
-        // TODO: implement
-        if (proc->program_counter > program_end) {
-            goto end;
+        ;
+        // TODO: check formats so we can know to assign the
+        proc->int_registers[19] = proc->program_counter;
+        int arg_list_printf[8] = {22, 23, 24, 25, 4, 5, 6, 7};
+        for (int i = 0; i < 8; ++i)
+        {
+            proc->program_counter = proc->int_registers[arg_list_printf[i]];
+            compute_heap_addr(proc);
+            arg_list_printf[i] = proc->program_counter / 8; // ram index of string, supposing they are byte aligned
         }
-        goto next_instr;
+        printf(&proc->ram[arg_list_printf[0]], &proc->ram[arg_list_printf[1]], &proc->ram[arg_list_printf[2]], &proc->ram[arg_list_printf[3]],
+               &proc->ram[arg_list_printf[4]], &proc->ram[arg_list_printf[5]], &proc->ram[arg_list_printf[6]], &proc->ram[arg_list_printf[7]]);
+        goto ret;
     call_scanf:
-        // TODO: implement
-        if (proc->program_counter > program_end) {
-            goto end;
+        ;
+        proc->int_registers[19] = proc->program_counter;
+        int arg_list_scanf[8] = {22, 23, 24, 25, 4, 5, 6, 7};
+        for (int i = 0; i < 8; ++i)
+        {
+            proc->program_counter = proc->int_registers[arg_list_scanf[i]];
+            compute_heap_addr(proc);
+            arg_list_printf[i] = proc->program_counter / 8; // ram index of string, supposing they are byte aligned
         }
-        goto next_instr;
+        scanf(&proc->ram[arg_list_printf[0]], &proc->ram[arg_list_printf[1]], &proc->ram[arg_list_printf[2]], &proc->ram[arg_list_printf[3]],
+               &proc->ram[arg_list_printf[4]], &proc->ram[arg_list_printf[5]], &proc->ram[arg_list_printf[6]], &proc->ram[arg_list_printf[7]]);
+        goto ret;
     call_strlen:
         ;
-        int return_addr_call_strlen = proc->program_counter;
+        proc->int_registers[19] = proc->program_counter;
         proc->program_counter = proc->int_registers[22];
         compute_heap_addr(proc);
         proc->int_registers[22] = strlen(&proc->ram[proc->program_counter / 8]);
-        proc->program_counter = return_addr_call_strlen;
-        if (proc->program_counter > program_end) {
-            goto end;
-        }
-        goto next_instr;
+        goto ret;
     call_cfunc:
-        // TODO: implement
-        if (proc->program_counter > program_end) {
-            goto end;
-        }
-        goto next_instr;
+        proc->int_registers[19] = proc->program_counter;
+        // TODO: implement and remove mock for testing the A example
+        proc->int_registers[22] = proc->int_registers[22] + proc->int_registers[22] + proc->int_registers[22];
+        goto ret;
     call_intern:
         // TODO: implement
         if (proc->program_counter > program_end) {

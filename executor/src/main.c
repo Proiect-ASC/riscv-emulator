@@ -186,16 +186,32 @@ void ex_9(processor_t *proc0) {
     printf("took %f to run, %f to setup, total %f (all times in seconds)", time_spent_clean, time_spent_dirty - time_spent_clean, time_spent_dirty);
 }
 
+void ex_10(processor_t *proc0) {
+    clock_t begin_dirty = clock();
+    assign_task(proc0, "../example_binaries/A.txt");
+    save_state(proc0, "../state_files/A.in");
+    clock_t begin_clean = clock();
+    run(proc0);
+    clock_t end_clean = clock();
+    double time_spent_clean = (double)(end_clean - begin_clean) / CLOCKS_PER_SEC;
+    save_state(proc0, "../state_files/A.out");
+    clock_t end_dirty = clock();
+    double time_spent_dirty = (double)(end_dirty - begin_dirty) / CLOCKS_PER_SEC;
+    printf("read file, program ends after %hu bits\n", proc0->assigned_task.program_end + 1);
+    printf("took %f to run, %f to setup, total %f (all times in seconds)", time_spent_clean, time_spent_dirty - time_spent_clean, time_spent_dirty);
+}
+
 int main() {
     processor_t proc0;
-    ex_1(&proc0);
-    ex_2(&proc0);
-    ex_3(&proc0);
-    ex_4(&proc0);
-    ex_5(&proc0);
-    ex_6(&proc0);
-    ex_7(&proc0);
-    ex_8(&proc0);
-    ex_9(&proc0);
+//    ex_1(&proc0);
+//    ex_2(&proc0);
+//    ex_3(&proc0);
+//    ex_4(&proc0);
+//    ex_5(&proc0);
+//    ex_6(&proc0);
+//    ex_7(&proc0);
+//    ex_8(&proc0);
+//    ex_9(&proc0);
+    ex_10(&proc0);
     return 0;
 }
