@@ -162,7 +162,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 						wtea(&encoded_arr[i - 1], code_table[CALLCFUNC]);
 						pc += strlen(code_table[CALLCFUNC]);
 						encoded_arr[i] = buffer_to_code(text, strlen(text + 1));
-						pc += strlen(text + 1);
+						pc += (strlen(text + 1) * 8);
 					}
 					else
 					{

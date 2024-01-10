@@ -170,7 +170,7 @@ int main(int argc, char **argv)
 {
 	init_kw_hashmap();
 	// For debug only
-	/*for(size_t i = 0; i < 12; i++)
+	for(size_t i = 0; i < 12; i++)
 	{
 		char file_name[200];
 		char extension[] = ".txt";
@@ -190,8 +190,8 @@ int main(int argc, char **argv)
 		strcpy(output_file + sizeof(folder_out), extension);
 		encode(&tarr, output_file, "code_table.txt");
 		printf("[DEBUG] Done\n\n");
-	}*/
-	if(argc != PROG_ARGC)
+	}
+	/*if(argc != PROG_ARGC)
 	{
 		fprintf(stderr, "[ERROR] expected %d program arguments, got %d instead\n", PROG_ARGC, argc);
 		exit(1);
@@ -202,7 +202,7 @@ int main(int argc, char **argv)
 	token_array tarr = lex_file(in_file_name);
 	parse(&tarr);
 	encode(&tarr, out_file_name, CODE_TABLE_PATH); 
-	printf("[INFO] Done. Exiting...\n");
+	printf("[INFO] Done. Exiting...\n");*/
 	hm_clear(&token_hashmap);
 	return 0;
 }
