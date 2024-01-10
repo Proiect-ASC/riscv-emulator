@@ -427,7 +427,7 @@ void run(processor_t *proc) {
         ;
         int rs_fsw = get_register(proc, &register_tree);
         int dest_addr_fsw = get_address(proc);
-        uint16_t dest_addr_reg_fsw = get_register(proc, &register_tree);
+        int dest_addr_reg_fsw = get_register(proc, &register_tree);
         int return_addr_fsw = proc->program_counter;
         proc->program_counter = dest_addr_fsw + proc->int_registers[dest_addr_reg_fsw];
         put_float_immediate(proc, proc->float_registers[rs_fsw]);
@@ -503,8 +503,8 @@ void run(processor_t *proc) {
         int rd_fmv_s_x = get_register(proc, &register_tree);
         int rs_fmv_s_x = get_register(proc, &register_tree);
         intfloat temp_fmv_s_x;
-        temp_fmv_s_x.f = proc->float_registers[rs_fmv_s_x];
-        proc->int_registers[rd_fmv_s_x] = temp_fmv_s_x.i;
+        temp_fmv_s_x.i = proc->int_registers[rs_fmv_s_x];
+        proc->float_registers[rd_fmv_s_x] = temp_fmv_s_x.f;
         if (proc->program_counter > program_end) {
             goto end;
         }
@@ -515,9 +515,9 @@ void run(processor_t *proc) {
         int rs1_flt_s = get_register(proc, &register_tree);
         int rs2_flt_s = get_register(proc, &register_tree);
         if (proc->float_registers[rs1_flt_s] < proc->float_registers[rs2_flt_s]) {
-            proc->float_registers[rd_flt_s] = 1;
+            proc->int_registers[rd_flt_s] = 1;
         } else {
-            proc->float_registers[rd_flt_s] = 0;
+            proc->int_registers[rd_flt_s] = 0;
         }
         if (proc->program_counter > program_end) {
             goto end;
@@ -529,9 +529,9 @@ void run(processor_t *proc) {
         int rs1_fgt_s = get_register(proc, &register_tree);
         int rs2_fgt_s = get_register(proc, &register_tree);
         if (proc->float_registers[rs1_fgt_s] > proc->float_registers[rs2_fgt_s]) {
-            proc->float_registers[rd_fgt_s] = 1;
+            proc->int_registers[rd_fgt_s] = 1;
         } else {
-            proc->float_registers[rd_fgt_s] = 0;
+            proc->int_registers[rd_fgt_s] = 0;
         }
         if (proc->program_counter > program_end) {
             goto end;
@@ -577,34 +577,63 @@ void run(processor_t *proc) {
         }
         goto next_instr;
     call_printf:
-        // TODO: implement
-        if (proc->program_counter > program_end) {
-            goto end;
+        ;
+        proc->int_registers[19] = proc->program_counter;
+        int arg_regs_printf[8] = {22, 23, 24, 25, 4, 5, 6, 7};
+        printf_arg args_printf[8];
+        bool is_s_fmt[7] = {0, 0, 0, 0, 0, 0, 0};
+        proc->program_counter = proc->int_registers[arg_regs_printf[0]];
+        compute_heap_addr(proc);
+        args_printf[0].s = (char*)&proc->ram[proc->program_counter / 8];
+        int curr_arg = 0;
+        for (int i = 1; args_printf[0].s[i] != 0; ++i)
+        {
+            if (args_printf[0].s[i] == 's' && args_printf[0].s[i - 1] == '%') is_s_fmt[curr_arg++] = 1;
         }
-        goto next_instr;
+        for (int i = 1; i < 8; ++i)
+        {
+            if (!is_s_fmt[i - 1]) {
+                args_printf[i].d = proc->int_registers[arg_regs_printf[i]];
+            }
+            else {
+                proc->program_counter = proc->int_registers[arg_regs_printf[i]];
+                compute_heap_addr(proc);
+                args_printf[i].s = (char*)&proc->ram[proc->program_counter / 8]; // ram index of string, supposing they are byte aligned
+            }
+        }
+        printf(args_printf[0].s,
+               is_s_fmt[0] ? args_printf[1].s : args_printf[1].d,
+               is_s_fmt[1] ? args_printf[2].s : args_printf[2].d,
+               is_s_fmt[2] ? args_printf[3].s : args_printf[3].d,
+               is_s_fmt[3] ? args_printf[4].s : args_printf[4].d,
+               is_s_fmt[4] ? args_printf[5].s : args_printf[5].d,
+               is_s_fmt[5] ? args_printf[6].s : args_printf[6].d,
+               is_s_fmt[6] ? args_printf[7].s : args_printf[7].d);
+        goto ret;
     call_scanf:
-        // TODO: implement
-        if (proc->program_counter > program_end) {
-            goto end;
+        ;
+        proc->int_registers[19] = proc->program_counter;
+        int arg_regs_scanf[8] = {22, 23, 24, 25, 4, 5, 6, 7};
+        for (int i = 0; i < 8; ++i)
+        {
+            proc->program_counter = proc->int_registers[arg_regs_scanf[i]];
+            compute_heap_addr(proc);
+            arg_regs_printf[i] = proc->program_counter / 8; // ram index of string, supposing they are byte aligned
         }
-        goto next_instr;
+        scanf((char*)&proc->ram[arg_regs_printf[0]], &proc->ram[arg_regs_printf[1]], &proc->ram[arg_regs_printf[2]], &proc->ram[arg_regs_printf[3]],
+              &proc->ram[arg_regs_printf[4]], &proc->ram[arg_regs_printf[5]], &proc->ram[arg_regs_printf[6]], &proc->ram[arg_regs_printf[7]]);
+        goto ret;
     call_strlen:
         ;
-        int return_addr_call_strlen = proc->program_counter;
+        proc->int_registers[19] = proc->program_counter;
         proc->program_counter = proc->int_registers[22];
         compute_heap_addr(proc);
-        proc->int_registers[22] = strlen(&proc->ram[proc->program_counter / 8]);
-        proc->program_counter = return_addr_call_strlen;
-        if (proc->program_counter > program_end) {
-            goto end;
-        }
-        goto next_instr;
+        proc->int_registers[22] = (int)strlen((char*)&proc->ram[proc->program_counter / 8]);
+        goto ret;
     call_cfunc:
-        // TODO: implement
-        if (proc->program_counter > program_end) {
-            goto end;
-        }
-        goto next_instr;
+        proc->int_registers[19] = proc->program_counter;
+        proc->int_registers[22] = proc->int_registers[22] + proc->int_registers[23] + proc->int_registers[24];
+        goto ret;
     call_intern:
         // TODO: implement
         if (proc->program_counter > program_end) {
