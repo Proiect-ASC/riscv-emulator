@@ -143,12 +143,6 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 					wtea(&encoded_arr[i - 1], code_table[CALLPRINTF]);
 					pc += strlen(code_table[CALLPRINTF]);
 				}
-				else if(strcmp(text, "cfunc") == 0 && tarr->array[i - 1].type == CALL)
-				{
-					free(encoded_arr[i - 1]);
-					wtea(&encoded_arr[i - 1], code_table[CALLCFUNC]);
-					pc += strlen(code_table[CALLCFUNC]);
-				}
 				else if(strcmp(text, "strlen") == 0 && tarr->array[i - 1].type == CALL)
 				{
 					free(encoded_arr[i - 1]);
@@ -163,8 +157,18 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 				}
 				else if(hm_get(&label_hm, text, &num_val) == -1)
 				{
-					fprintf(stderr, "[ERROR] symbol %s not found\n", text);
-					exit(1);
+					if(tarr->array[i - 1].type == CALL)
+					{
+						wtea(&encoded_arr[i - 1], code_table[CALLCFUNC]);
+						pc += strlen(code_table[CALLCFUNC]);
+						encoded_arr[i] = buffer_to_code(text, strlen(text + 1));
+						pc += strlen(text + 1);
+					}
+					else
+					{
+						fprintf(stderr, "[ERROR] symbol %s not found\n", text);
+						exit(1);
+					}
 				}
 				else if(tarr->array[i - 1].type == CALL)
 				{
