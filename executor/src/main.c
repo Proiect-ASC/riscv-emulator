@@ -9,9 +9,10 @@ void ex_1(processor_t *proc0) {
     proc0->int_registers[22] = 192;
     assign_task(proc0, "../example_binaries/1.txt");
     memcpy(proc0->assigned_task.content + 24, str, strlen(str) + 1);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/1.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/1.out");
@@ -30,9 +31,10 @@ void ex_2(processor_t *proc0) {
     proc0->int_registers[23] = 192;
     assign_task(proc0, "../example_binaries/2.txt");
     memcpy(proc0->assigned_task.content + 24, str, strlen(str) + 1);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/2.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/2.out");
@@ -52,9 +54,10 @@ void ex_3(processor_t *proc0) {
     proc0->int_registers[24] = 6;
     assign_task(proc0, "../example_binaries/3.txt");
     memcpy(proc0->assigned_task.content + 49, str, strlen(str) + 1);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/3.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/3.out");
@@ -72,9 +75,10 @@ void ex_4(processor_t *proc0) {
     proc0->int_registers[22] = 648;
     assign_task(proc0, "../example_binaries/4.txt");
     memcpy(proc0->assigned_task.content + 81, str, strlen(str) + 1);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/4.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/4.out");
@@ -93,9 +97,10 @@ void ex_5(processor_t *proc0) {
     proc0->int_registers[23] = 11;
     assign_task(proc0, "../example_binaries/5.txt");
     memcpy(proc0->assigned_task.content + 37, a, 44);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/5.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/5.out");
@@ -115,9 +120,10 @@ void ex_6(processor_t *proc0) {
     proc0->int_registers[23] = 4;
     assign_task(proc0, "../example_binaries/6.txt");
     memcpy(proc0->assigned_task.content + 59, a, 32);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/6.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/6.out");
@@ -141,9 +147,10 @@ void ex_7(processor_t *proc0) {
     assign_task(proc0, "../example_binaries/7.txt");
     memcpy(proc0->assigned_task.content + 32, a, 16);
     memcpy(proc0->assigned_task.content + 48, b, 16);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/7.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/7.out");
@@ -163,9 +170,10 @@ void ex_8(processor_t *proc0) {
     proc0->int_registers[22] = 392;
     proc0->int_registers[23] = 396;
     assign_task(proc0, "../example_binaries/8.txt");
+    run(proc0, true, true);
     save_state(proc0, "../state_files/8.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/8.out");
@@ -189,9 +197,10 @@ void ex_9(processor_t *proc0) {
     memcpy(proc0->assigned_task.content + 6, &list, 16);
     memcpy(proc0->assigned_task.content + 22, &element, 16);
     assign_task(proc0, "../example_binaries/9.txt");
+    run(proc0, true, true);
     save_state(proc0, "../state_files/9.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/9.out");
@@ -206,9 +215,10 @@ void ex_9(processor_t *proc0) {
 void ex_10(processor_t *proc0) {
     clock_t begin_dirty = clock();
     assign_task(proc0, "../example_binaries/A.txt");
+    run(proc0, true, true);
     save_state(proc0, "../state_files/A.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/A.out");
@@ -227,9 +237,10 @@ void ex_11(processor_t *proc0) {
     proc0->int_registers[24] = 11;
     assign_task(proc0, "../example_binaries/B.txt");
     memcpy(proc0->assigned_task.content + 58, a, 44);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/B.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/B.out");
@@ -253,9 +264,10 @@ void ex_12(processor_t *proc0) {
     memcpy(proc0->assigned_task.content + 80, dst, 12);
     memcpy(proc0->assigned_task.content + 92, a, 36);
     memcpy(proc0->assigned_task.content + 128, vector, 12);
+    run(proc0, true, true);
     save_state(proc0, "../state_files/C.in");
     clock_t begin_clean = clock();
-    run(proc0);
+    run(proc0, false, false);
     clock_t end_clean = clock();
     double time_spent_clean = (double) (end_clean - begin_clean) / CLOCKS_PER_SEC;
     save_state(proc0, "../state_files/C.out");
@@ -272,17 +284,8 @@ void ex_12(processor_t *proc0) {
 
 int main() {
     processor_t proc0;
-    ex_1(&proc0);
-    ex_2(&proc0);
-    ex_3(&proc0);
-    ex_4(&proc0);
-    ex_5(&proc0);
-    ex_6(&proc0);
-    ex_7(&proc0);
-    ex_8(&proc0);
-    ex_9(&proc0);
-    ex_10(&proc0);
-    ex_11(&proc0);
-    ex_12(&proc0);
+    assign_task(&proc0, "../example_binaries/A.txt");
+    load_state(&proc0, "../state_files/A.in");
+    run(&proc0, false, false);
     return 0;
 }

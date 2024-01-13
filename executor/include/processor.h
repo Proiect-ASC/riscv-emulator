@@ -63,6 +63,6 @@ static inline float get_float_immediate(processor_t *proc);
 
 static inline void put_float_immediate(processor_t *proc, float imm);
 
-void run(processor_t *proc);
+void run(processor_t *proc, bool must_load_into_ram, bool load_and_quit);
 
 #endif //EXECUTOR_PROCESSOR_H

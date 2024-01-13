@@ -140,7 +140,7 @@ static inline void put_float_immediate(processor_t *proc, float imm) {
     }
 }
 
-void run(processor_t *proc) {
+void run(processor_t *proc, bool must_load_into_ram, bool load_and_quit) {
     /* to match instructions or registers to indices, look up the huffman tree and match, in order, each item with the
      * respective position in the array, n-th item to n-th array position, such as
      * a4 ... register_indices[4] = 4 (because a4 is the 5th int register to appear)
@@ -203,7 +203,12 @@ void run(processor_t *proc) {
                               1; // return address (ra) to program end + 1 from the test examples, because no main is defined
     proc->int_registers[SP] = RAM_SIZE + 7 * (proc->assigned_task.program_end + proc->assigned_task.remainder + 1) / 8 -
                               1; // stack pointer is at bottom of the stack
-    memcpy(proc->ram, proc->assigned_task.content, RAM_SIZE);
+    if (must_load_into_ram)
+    {
+        memcpy(proc->ram, proc->assigned_task.content, RAM_SIZE);
+        if (load_and_quit)
+            return;
+    }
     uint8_t index = 0, old_index;
     next_instr:
     while (instruction_tree.nodes[index].value.i == -1) {
