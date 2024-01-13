@@ -288,17 +288,17 @@ void ex_12(processor_t *proc0)
 int main()
 {
     processor_t proc0;
-//    ex_1(&proc0);
-//    ex_2(&proc0);
-//    ex_3(&proc0);
-//    ex_4(&proc0);
-//    ex_5(&proc0);
-//    ex_6(&proc0);
-//    ex_7(&proc0);
-//    ex_8(&proc0);
-//    ex_9(&proc0);
+    ex_1(&proc0);
+    ex_2(&proc0);
+    ex_3(&proc0);
+    ex_4(&proc0);
+    ex_5(&proc0);
+    ex_6(&proc0);
+    ex_7(&proc0);
+    ex_8(&proc0);
+    ex_9(&proc0);
     ex_10(&proc0);
-//    ex_11(&proc0);
-//    ex_12(&proc0);
+    ex_11(&proc0);
+    ex_12(&proc0);
     return 0;
 }

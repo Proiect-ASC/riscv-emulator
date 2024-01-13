@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <huffman_enums.h>
 
 #define MAX_CODE_LENGHT 32
 
@@ -20,6 +21,8 @@ typedef struct huffman_tree
     uint8_t size;
 } huffman_tree;
 
-huffman_tree load_huffman_tree(const char *file_name, int *indices);
+huffman_tree load_huffman_tree_instr(const char *file_name, instruction *indices);
+
+huffman_tree load_huffman_tree_reg(const char *file_name, rgstr *indices);
 
 #endif

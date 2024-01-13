@@ -24,7 +24,7 @@ typedef struct binary
 typedef struct processor_t
 {
     uint8_t ram[RAM_SIZE];
-    uint16_t program_counter;
+    uint16_t memory_indicator; // acts like PC when viewed from inside the VM
     int int_registers[INT_REG_COUNT];
     float float_registers[FLOAT_REG_COUNT];
     binary assigned_task;
@@ -56,7 +56,7 @@ void assign_task(processor_t *proc, const char *file_handle);
 
 static inline uint16_t get_address(processor_t *proc);
 
-static inline uint8_t get_register(processor_t *proc, const huffman_tree *register_tree);
+static inline rgstr get_register(processor_t *proc, const huffman_tree *register_tree);
 
 static inline void compute_heap_addr(processor_t *proc);
 
