@@ -7,16 +7,19 @@
 
 #define MAX_CODE_LENGHT 32
 
-typedef struct huffman_node
-{
-    int value;
+typedef union tree_val {
+    int i;
+    void *ptr;
+} tree_val;
+
+typedef struct huffman_node {
+    tree_val value;
     const char *code;
     int8_t left_index;
     int8_t right_index;
 } huffman_node;
 
-typedef struct huffman_tree
-{
+typedef struct huffman_tree {
     huffman_node *nodes;
     uint8_t size;
 } huffman_tree;

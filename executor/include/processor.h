@@ -14,15 +14,13 @@
 #define FLOAT_REG_COUNT 32
 #define ADDRESS_LENGTH 16
 
-typedef struct binary
-{
+typedef struct binary {
     uint8_t remainder;
     uint16_t program_start, program_end;
     uint8_t content[RAM_SIZE];
 } binary;
 
-typedef struct processor_t
-{
+typedef struct processor_t {
     uint8_t ram[RAM_SIZE];
     uint16_t memory_indicator; // acts like PC when viewed from inside the VM
     int int_registers[INT_REG_COUNT];
@@ -30,20 +28,17 @@ typedef struct processor_t
     binary assigned_task;
 } processor_t;
 
-typedef union intfloat
-{
+typedef union intfloat {
     int32_t i;
     float f;
 } intfloat;
 
-typedef union signedunsigned
-{
+typedef union signedunsigned {
     int32_t s;
     uint32_t u;
 } signedunsigned;
 
-typedef union printf_arg
-{
+typedef union printf_arg {
     char *s;
     int d;
 } printf_arg;

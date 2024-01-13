@@ -1,47 +1,6 @@
-typedef enum instruction
-{
-    ADDI,
-    J,
-    SLLI,
-    LW,
-    BLE,
-    BNEZ,
-    CALL_CFUNC,
-    CALL_SCANF,
-    CALL_STRLEN,
-    FADD_D,
-    FMUL_D,
-    FGT_S,
-    FSQRT_D,
-    MV,
-    RET,
-    LI,
-    ADD,
-    CALL_INTERN,
-    FLW,
-    FADD_S,
-    FMV_S_X,
-    FLT_S,
-    SUB,
-    LD,
-    LB,
-    BEQZ,
-    SB,
-    BGE,
-    FLD,
-    FSW,
-    FMUL_S,
-    FMV_S,
-    FSUB_D,
-    CALL_PRINTF,
-    LA,
-    BGT,
-    SD,
-    SRAI
-} instruction;
+typedef void *instruction;
 
-typedef enum rgstr
-{
+typedef enum rgstr {
     T3 = 0,
     T4 = 1,
     T5 = 2,
