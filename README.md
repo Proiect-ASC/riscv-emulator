@@ -73,3 +73,7 @@ To run the examples you must run the binaries with their respective statefile, u
 ```--load-statefile``` flag. Check the CLI help for further instructions. Warning: ```--generate-statefiles``` flag
 rewrites the statefiles, and supposes that
 the loaded binary can run without an input statefile.
+
+To use extern C functions, you must write the function declaration respectively it's definition in the libraries.h /
+libraries.c files. After that, you must go to the extern_function_caller.c file, and you must define
+an ABI for the function call. Then, rebuild the project.
