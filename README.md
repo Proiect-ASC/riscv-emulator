@@ -66,9 +66,10 @@ Attention! Generating statefiles uses relative paths. Make sure to run the proje
 Use the following command to display usage:
 
 ```
-./executor -h
+./executor --help
 ```
 
 To run the examples you must run the binaries with their respective statefile, using the
-```-s``` flag. Check the CLI help for further instructions. Warning: ```-g``` flag rewrites the statefiles, and supposes that 
+```--load-statefile``` flag. Check the CLI help for further instructions. Warning: ```--generate-statefiles``` flag
+rewrites the statefiles, and supposes that
 the loaded binary can run without an input statefile.
