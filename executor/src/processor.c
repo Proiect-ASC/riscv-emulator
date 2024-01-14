@@ -1,21 +1,21 @@
 #include "processor.h"
 #include "extern_function_caller.h"
 
+// it's 03:32 14/01/2024, deadline is in a few hours, I spent 5 hours debugging this because I forgot to add binary mode to fopen....
 void save_state(const processor_t *proc, const char *state_file_handle) {
-    FILE *state_file = fopen(state_file_handle, "w");
-    fwrite(proc->ram, 1, RAM_SIZE, state_file);
-    fwrite(&proc->memory_indicator, 2, 1, state_file);
-    fwrite(proc->int_registers, 4, 32, state_file);
-    fwrite(proc->float_registers, 4, 32, state_file);
+    FILE *state_file = fopen(state_file_handle, "wb");
+    fwrite(proc->ram, sizeof(uint8_t), sizeof(proc->ram)/sizeof(uint8_t), state_file);
+    fwrite((char*)proc->int_registers, sizeof(proc->int_registers), 1, state_file);
+    fwrite((char*)proc->float_registers, sizeof(proc->float_registers), 1, state_file);
     fclose(state_file);
 }
 
+
 void load_state(processor_t *proc, const char *state_file_handle) {
-    FILE *state_file = fopen(state_file_handle, "r");
-    fread(proc->ram, 1, RAM_SIZE, state_file);
-    fread(&proc->memory_indicator, 2, 1, state_file);
-    fread(proc->int_registers, 4, 32, state_file);
-    fread(proc->float_registers, 4, 32, state_file);
+    FILE *state_file = fopen(state_file_handle, "rb");
+    fread(proc->ram, sizeof(uint8_t), sizeof(proc->ram)/sizeof(uint8_t), state_file);
+    fread((char*)proc->int_registers, sizeof(proc->int_registers), 1, state_file);
+    fread((char*)proc->float_registers, sizeof(proc->float_registers), 1, state_file);
     fclose(state_file);
 }
 
