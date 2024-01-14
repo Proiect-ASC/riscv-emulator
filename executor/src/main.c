@@ -9,10 +9,10 @@ int main(int argc, char* argv[]) {
     }
     if (argc == 2)
     {
-        if (strcmp(argv[1], "-h") == 0)
+        if (strcmp(argv[1], "--help") == 0)
         {
-            printf("\nUsage:\n\texecutor -h -> display this message;\n\texecutor <path> -> run binary at <path>;\n\texecutor <path0> -s <path1> -> run binary at"
-                    " <path0> after loading statefile at <path1>;\n\texecutor <path0> -g <path1> <path2> -> run binary at <path0> and generate input and output statefiles"
+            printf("\nUsage:\n\texecutor --help -> display this message;\n\texecutor <path> -> run binary at <path>;\n\texecutor <path0> --load-statefile <path1> -> run binary at"
+                   " <path0> after loading statefile at <path1>;\n\texecutor <path0> --generate-statefiles <path1> <path2> -> run binary at <path0> (must be able to run without a statefile!) and generate input and output statefiles"
                     " at <path1> respectively <path2>;\n");
             exit(1);
         }
@@ -34,15 +34,17 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
     else {
-        if (strcmp(argv[2], "-s") != 0 && strcmp(argv[2], "-g") != 0) {
-            fprintf(stderr, "\n[Error] Unrecognized flag %s, expecting -s (use statefile) or -g (generate statefiles), terminating program...",
+        if (strcmp(argv[2], "--load-statefile") != 0 && strcmp(argv[2], "--generate-statefiles") != 0) {
+            fprintf(stderr,
+                    "\n[Error] Unrecognized flag %s, expecting --load-statefile or --generate-statefiles, terminating program...",
                     argv[2]);
             exit(1);
         } else {
             if (argc == 4) {
-                if (strcmp(argv[2], "-s") != 0)
+                if (strcmp(argv[2], "--load-statefile") != 0)
                 {
-                    fprintf(stderr, "\n[Error] Too few program arguments for -g, found 4, expecting 5, terminating program...");
+                    fprintf(stderr,
+                            "\n[Error] Too few program arguments for --generate-statefiles, found 4, expecting 5, terminating program...");
                     exit(1);
                 }
                 printf("\n[Status] Creating virtual processor...");
@@ -60,9 +62,10 @@ int main(int argc, char* argv[]) {
             } else {
                 if (argc == 5)
                 {
-                    if (strcmp(argv[2], "-g") != 0)
+                    if (strcmp(argv[2], "--generate-statefiles") != 0)
                     {
-                        fprintf(stderr, "\n[Error] Too many program arguments for -s, found 5, expecting 4, terminating program...");
+                        fprintf(stderr,
+                                "\n[Error] Too many program arguments for --load-statefile, found 5, expecting 4, terminating program...");
                         exit(1);
                     }
                     printf("\n[Status] Creating virtual processor...");
