@@ -17,6 +17,9 @@ The following contributors are from group 152, 1st year:
 
 # Project description
 
+###``` Executor
+
+###### Executor description:
 The executor took inspiration from Forth machines, featuring a Huffman threading approach to dispatching
 instructions. It also implements a modular architecture, so changes to the register count or types is easily done.
 One mention is that by the professor's request, we had to limit ourselves to 32-bit immediates, but that is easily
@@ -33,3 +36,13 @@ function
 caller, it does not require the whole project recompilation). This is a tehnique Dave Cutler (the mind behind Windows)
 also
 used.
+
+###### Executor usage:
+
+Attention! Generating statefiles uses relative paths. Make sure to run the project inside a folder!
+
+Use the following command to display usage:
+
+```
+./executor -h
+```
