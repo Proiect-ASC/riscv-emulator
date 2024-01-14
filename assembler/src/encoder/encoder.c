@@ -269,7 +269,7 @@ char **tarr_to_encoded(token_array *tarr, char code_table[][MAX_CODE_LENGTH + 1]
 
 void encode(token_array *tarr, const char *output_file_name, const char *code_table_path)
 {
-	FILE *f = fopen(output_file_name, "w");
+	FILE *f = fopen(output_file_name, "wb");
 	check_file(f, output_file_name);
 	char code_table[COUNT_TOKEN_TYPE][MAX_CODE_LENGTH + 1] = {{0}};
 	char str_byte[9];
