@@ -20,7 +20,7 @@ The following contributors are from group 152 (except Izabela, she is from group
 ### Assembler
 
 ###### Assembler description:
-The assembler was fun to write and it came with its unique challenges. We chose to employ a Definite Finite Automaton
+The assembler was fun to write and it came with its unique challenges. We chose to employ a Deterministic Finite Automaton
 (DFA) for the lexer part of it, because it is a robust implementation and does not leave room for errors that could
 arrise from naive string operations. After the input file is tokenized by the lexer, we chose to write a simple
 parser that validates the input and makes sure that every instruction has appropriate parameters. This step was
